@@ -1,0 +1,134 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">党员论坛</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbshome');}">
+                    全部话题
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbscate');}">
+                    话题分类
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mytopic'));}">
+                    我发表的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyown'));}">
+                    我评论的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyother'));}">
+                    回复我的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mycollect'));}">
+                    我收藏的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myzan'));}">
+                    我点赞的
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl">
+<form method="post" name="myform" action="{php echo $this->createMobileUrl('bbspost',array('op'=>'addpost'));}" class="am-form" data-am-validator>
+    <div class="am-form-group">
+        <label>分类：</label>
+        <select name="cateid" required>
+            <option value="">请选择话题分类...</option>
+            {loop $cate $row}
+            <option value="{$row['id']}">{$row['name']}</option>
+            {/loop}
+        </select>
+    </div>
+    <div class="am-form-group">
+        <label>标题：</label>
+        <input type="text" class="am-form-field" name="title" value="" placeholder="输入上报标题..." required>
+    </div>
+    <div class="am-form-group">
+        <label>内容：</label>
+        <textarea class="am-form-field" name="details" placeholder="输入内容描述..." rows="5" required></textarea>
+    </div>
+    <div class="am-form-group am-form-file">
+        <button type="button" class="am-btn am-btn-default am-btn-block am-btn-sm">
+        <i class="am-icon-cloud-upload"></i> 选择要上传的图片</button>
+        <input type="file" id="formfileimage" accept="image/*">
+    </div>
+    <ul class="am-avg-sm-5 am-thumbnails upimage-all" id="image-list">
+    </ul>
+
+    <div class="am-form-group am-padding-top">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="立即提交">
+    </div>
+</form>
+</div>
+
+<script>
+$(function() {
+    $('#formfileimage').change(function() {
+        var formData = new FormData();
+        formData.append('upfile', $('input[id=formfileimage]')[0].files[0]);
+        $.ajax({ 
+            url: "{php echo $this->createMobileUrl('uploadimage');}",
+            data: formData,
+            type: 'POST',
+            async: false,
+            cache: false,
+            processData : false, 
+            contentType : false,
+            dataType: 'json',
+            beforeSend:function(){},//触发ajax请求开始时执行
+            success: function(ret){//ajax成功时执行
+                console.log(ret);
+                if (ret['success']) {
+                    var html = '';
+                    html += '<li>';
+                    html += '<a href="javascript:;" class="am-close am-close-alt am-icon-times"></a>';
+                    html += '<img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}'+ret['path']+'" />';
+                    html += '<input type="hidden" name="picall[]" value="'+ret['path']+'" />';
+                    html += '</li>';
+                    $('#image-list').append(html);
+                }
+            },
+            error:function(){},//ajax发生错误时执行
+            complete:function(){}//ajax请求完成时执行
+        });
+    });
+});
+$("#image-list").on("click","li a",function(){
+    $(this).parent().remove();
+})
+</script>
+
+
+{template 'footer'}
+{/if}

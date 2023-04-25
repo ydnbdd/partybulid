@@ -1,0 +1,88 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">话题分类</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbshome');}">
+                    全部话题
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbscate');}">
+                    话题分类
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mytopic'));}">
+                    我发表的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyown'));}">
+                    我评论的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyother'));}">
+                    回复我的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mycollect'));}">
+                    我收藏的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myzan'));}">
+                    我点赞的
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+
+<div class="am-container am-margin-bottom-sm bg-fff">
+<ul class="am-avg-sm-4 default-nav ser-nav am-margin-bottom-0">
+    {loop $cate1 $row}
+    <li>
+        <a href="{php echo $this->createMobileUrl('bbshome',array('cateid'=>$row['id']));}">
+            <img src="{php echo tomedia($row['cicon']);}">
+            <p class="am-text-truncate">{$row['name']}</p>
+        </a>
+    </li>
+    {/loop}   
+</ul>
+</div>
+
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl am-text-justify">
+    {loop $cate2 $row}
+    <a class="am-btn am-btn-default am-btn-sm am-margin-bottom-sm" href="{php echo $this->createMobileUrl('bbshome',array('cateid'=>$row['id']));}">
+        {$row['name']}
+    </a>
+    {/loop}
+</div>
+
+<a href="{php echo $this->createMobileUrl('bbspost');}" class="messagebtn">
+    <i class="am-icon-edit"></i>
+</a>
+
+{template 'footer'}
+{/if}

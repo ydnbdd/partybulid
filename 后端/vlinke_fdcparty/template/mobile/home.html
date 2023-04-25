@@ -1,0 +1,265 @@
+{template 'header'}
+<!-- 轮播图 -->
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $slide $row}
+        <li>
+            <a href="{$row['link']}">
+                <img src="{php echo tomedia($row['tilpic']);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+
+{if !empty($notice)}
+<div class="am-container bg-fff noticebox">
+    <div class="am-g">
+        <div class="am-u-sm-1">
+            <i class="am-icon-volume-up notice_icon"></i>
+        </div>
+        <div class="am-u-sm-11" id="noticebox">
+            <ul>
+                {loop $notice $row}
+                <li class="am-text-truncate">
+                    <a class="am-text-truncate" href="{php echo $this->createMobileUrl('notice',array('op'=>'details','id'=>$row['id']));}">
+                        {$row['title']}
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+        </div>
+    </div>
+</div>
+{if 1 < count($notice)}
+<script type="text/javascript">
+function AutoScroll(obj) {
+    $(obj).find("ul:first").animate({
+        marginTop: "-36px"
+    },
+    500,
+    function() {
+        $(this).css({
+            marginTop: "0px"
+        }).find("li:first").appendTo(this);
+    });
+}
+$(document).ready(function() {
+    setInterval('AutoScroll("#noticebox")', 3000)
+});
+</script>
+{/if}
+{/if}
+
+<ul class="am-avg-sm-{$param['homenav']['number']} default-nav home-nav am-margin-bottom-0 bg-fff">
+    {loop $param['homenav']['info'] $row}
+    <li>
+        <a href="{$row['url']}">
+            <img src="{php echo tomedia($row['pic']);}">
+            <p class="am-text-truncate">{$row['til']}</p>
+        </a>
+    </li>
+    {/loop}
+</ul>
+
+
+<div data-am-widget="tabs" class="am-tabs am-tabs-d2 bg-fff am-margin-left-0 am-margin-right-0 am-margin-bottom-0">
+<ul class="am-tabs-nav am-cf">
+    {loop $param['homecon'] $conkey $conrow}
+    <li class="{if $conkey==0}am-active{/if}"><a href="[data-tab-panel-{$conkey}]">{$conrow['til']}</a></li>
+    {/loop}
+</ul>
+<div class="am-tabs-bd">
+{loop $param['homecon'] $conkey $conrow}
+
+{if $conrow['tab']=="article"}
+<div data-tab-panel-{$conkey} data-am-widget="list_news" class="am-tab-panel {if $conkey==0}am-active{/if} am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list">
+{loop $article $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <a href="{php echo $this->createMobileUrl('article',array('id'=>$row['id']));}">
+    {if empty($row['tilpic'])}
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+        </div>
+    </div>
+    {else}
+    <div class="am-u-sm-4 am-list-thumb">
+        <img src="{php echo tomedia($row['tilpic']);}"/>
+    </div>
+    <div class="am-u-sm-8 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+        </div>
+    </div>
+    {/if}
+    </a>
+</li>
+{/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('arthome');}" class="am-btn am-btn-default am-btn-block">查看更多</a>
+</div>
+</div>
+
+{elseif $conrow['tab']=="edulesson"}
+
+<div data-tab-panel-{$conkey} class="am-tab-panel {if $conkey==0}am-active{/if} am-container bg-fff am-padding-top">
+<ul class="am-avg-sm-2 am-thumbnails">
+{loop $edulesson $row}
+<li class="edulesson-box">
+    <a href="{php echo $this->createMobileUrl('edulesson',array('id'=>$row['id']));}">
+    <img class="am-img-thumbnail" src="{php echo tomedia($row['tilpic']);}"/>
+    <h3 class="am-margin-vertical-xs am-text-justify">
+        {$row['title']}
+    </h3>
+    <p class="am-margin-vertical-xs am-text-xs am-link-muted">
+        {if $row['stustatus']==1}
+        <span class="am-fr am-badge am-badge-danger">必修</span>
+        {else}
+        <span class="am-fr am-badge am-badge-primary">选修</span>
+        {/if}
+        <span>{php echo $row['status']==1 ? "更新中" : "已结课" ;}</span>
+    </p>
+    </a>
+</li>
+{/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('eduhome');}" class="am-btn am-btn-default am-btn-block">查看更多</a>
+</div>
+
+{elseif $conrow['tab']=="activity"}
+
+<div data-tab-panel-{$conkey} data-am-widget="list_news" class="am-tab-panel {if $conkey==0}am-active{/if} am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list">
+{loop $activity $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['id']));}">
+    {if empty($row['tilpic'])}
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+            {if $row['status']==2}
+            <span class="am-badge am-badge-primary am-fr">报名中</span>
+            {elseif $row['status']==3}
+            <span class="am-badge am-badge-success am-fr">已结束</span>
+            {/if}
+        </div>
+    </div>
+    {else}
+    <div class="am-u-sm-4 am-list-thumb">
+        <img src="{php echo tomedia($row['tilpic']);}"/>
+    </div>
+    <div class="am-u-sm-8 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+            {if $row['status']==2}
+            <span class="am-badge am-badge-primary am-fr">报名中</span>
+            {elseif $row['status']==3}
+            <span class="am-badge am-badge-success am-fr">已结束</span>
+            {/if}
+        </div>
+    </div>
+    {/if}
+    </a>
+</li>
+{/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('acthome');}" class="am-btn am-btn-default am-btn-block">查看更多</a>
+</div>
+</div>
+
+{elseif $conrow['tab']=="seritem"}
+
+<div data-tab-panel-{$conkey} data-am-widget="list_news" class="am-tab-panel {if $conkey==0}am-active{/if} am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list">
+{loop $seritem $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <a href="{php echo $this->createMobileUrl('seritem',array('id'=>$row['id']));}">
+    {if empty($row['tilpic'])}
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+            {if $row['status']==2}
+            <span class="am-badge am-badge-primary am-fr">认领中</span>
+            {elseif $row['status']==3}
+            <span class="am-badge am-badge-success am-fr">已完成</span>
+            {/if}
+        </div>
+    </div>
+    {else}
+    <div class="am-u-sm-4 am-list-thumb">
+        <img src="{php echo tomedia($row['tilpic']);}"/>
+    </div>
+    <div class="am-u-sm-8 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            {php echo empty($row['name']) ? $param['nicktil'] : $row['name'] ;}
+            {if $row['status']==2}
+            <span class="am-badge am-badge-primary am-fr">认领中</span>
+            {elseif $row['status']==3}
+            <span class="am-badge am-badge-success am-fr">已完成</span>
+            {/if}
+        </div>
+    </div>
+    {/if}
+    </a>
+</li>
+{/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('serhome');}" class="am-btn am-btn-default am-btn-block">查看更多</a>
+</div>
+</div>
+
+{elseif $conrow['tab']=="exapaper"}
+
+<div data-tab-panel-{$conkey} data-am-widget="list_news" class="am-tab-panel {if $conkey==0}am-active{/if} am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list">
+{loop $exapaper $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <a href="{php echo $this->createMobileUrl('exapaper',array('op'=>'create','exapaperid'=>$row['id']));}">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            考试时长：{$row['timelimit']}分钟<br>
+            截止时间：{php echo date("Y-m-d H:i",$row['endtime']);}
+        </div>
+        </a>
+    </div>
+</li>
+{/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('exahome');}" class="am-btn am-btn-default am-btn-block">查看更多</a>
+</div>
+</div>
+
+{/if}
+
+{/loop}
+</div>
+</div>
+
+{template 'footer'}

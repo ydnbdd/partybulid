@@ -1,0 +1,119 @@
+{template 'header'}
+<style type="text/css">
+html,body{ width: 100%; height: 100%; }
+body{ background-image: url("{php echo tomedia($param['loginpic']);}"); background-size: 100% 100%; background-repeat: no-repeat; }
+</style>
+
+
+
+<div class="am-panel am-panel-default am-center log-box">
+    <!-- <div class="am-panel-hd">党员登录</div> -->
+    <div class="am-panel-bd">
+        <form method="post" name="myform" action="{php echo $this->createMobileUrl('login',array('op'=>'post'));}" class="am-form" data-am-validator>
+            <div class="am-form-group am-form-icon">
+                <i class="am-icon-user"></i>
+                <input type="text" class="am-form-field" name="realname" placeholder="输入真实姓名..." required>
+            </div>
+
+            {if $param['loginidnumber']==1}
+            <div class="am-form-group am-form-icon">
+                <i class="am-icon-info-circle"></i>
+                <input type="text" class="am-form-field" name="idnumber" placeholder="输入身份证号..." required>
+            </div>
+            {/if}
+            
+            {if $param['loginmobile']==0}
+            {elseif $param['loginmobile']==1}
+            <div class="am-form-group am-form-icon">
+                <i class="am-icon-phone-square"></i>
+                <input type="text" class="am-form-field" name="mobile" placeholder="输入手机号..." required>
+            </div>
+            {elseif $param['loginmobile']==2}
+            <div class="am-form-group am-form-icon">
+                <i class="am-icon-phone-square"></i>
+                <input type="text" class="am-form-field" name="mobile" id="mobile" placeholder="输入手机号..." required>
+            </div>
+            <div class="am-form-group">
+                <div class="am-input-group">
+                    <input type="text" class="am-form-field" name="code" placeholder="输入验证码..." required>
+                    <span class="am-input-group-label" id="getcode">获取验证码</span>
+                </div>
+            </div>
+            {/if}
+
+            <div class="am-form-group">
+                <input type="hidden" name="token" value="{$_W['token']}" />
+                <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="绑定微信登录">
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+var countdown=60; 
+function settime(obj) { 
+    if (countdown == 0) {  
+        obj.html("重新发送验证码"); 
+        countdown = 60; 
+        return;
+    } else { 
+        obj.html(countdown+"s后重新发送"); 
+        countdown--; 
+    } 
+    setTimeout(function() { settime(obj) } ,1000);
+}
+
+$("#getcode").click(function(){
+    if ( countdown!=60 ) { return false; }
+    var mobile = $("#mobile").val();
+    if( mobile=='' ){
+        alert('请输入手机号...');
+        return false;
+    }
+    var myreg=/^[1][3,4,5,7,8,9][0-9]{9}$/;
+    if ( !myreg.test(mobile) ) {
+        alert('你输入的手机号格式不正确...');
+        return false;
+    }
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: {mobile: mobile},
+        url: "{php echo $this->createmobileUrl('login',array('op'=>'getmobilecode'));}",
+        cache: false,
+        beforeSend:function(){},
+        success: function(res){
+            if ( res['ret']=='error' ) {
+                alert(res['msg']);
+            }else if ( res['ret']=='success' ) {
+                settime($("#getcode"));
+            }
+            console.log(res);
+        },
+        error:function(){},
+        complete:function(){}
+    });
+});
+</script>
+
+
+<script type="text/javascript">
+wx.ready(function () {
+    sharedata = {
+        title: "{$param['sharetitle']}",
+        desc: "{$param['sharedesc']}",
+        link: "{$_W['siteurl']}",
+        imgUrl:"{php echo tomedia($param['sharepic']);}",
+        success: function(){},
+        cancel: function(){}
+    };
+    wx.showOptionMenu();
+    wx.onMenuShareAppMessage(sharedata);
+    wx.onMenuShareTimeline(sharedata);
+    wx.onMenuShareQQ(sharedata);
+    wx.onMenuShareWeibo(sharedata);
+});
+</script>
+</body>
+</html>

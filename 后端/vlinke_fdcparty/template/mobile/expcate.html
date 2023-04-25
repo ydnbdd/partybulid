@@ -1,0 +1,106 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">党费缴纳</h1>
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('expcate');}">
+                    党费缴纳
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('explog');}">
+                    交费记录
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('expcount');}">
+                    党费计算器
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+</ul>
+</div>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('expcate',array('op'=>'getmore','cateid'=>$cateid));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <a href="{php echo $this->createMobileUrl('expense',array('cateid'=>$row['id']));}">
+            <h3 class="am-list-item-hd am-text-justify">
+                {$row['name']}
+            </h3>
+            <p class="am-text-danger am-margin-vertical-xs">
+                {if $row['status']==1}
+                自由金额
+                {elseif $row['status']==2}
+                ￥ {$row['catemoney']}
+                {elseif $row['status']==3}
+                    {if empty($expense[$row['id']])}
+                    指定党员
+                    {else}
+                    ￥ {$expense[$row['id']]['paymoney']}
+                    {/if}
+                {/if}
+            </p>
+            <div class="am-list-item-text">
+                {$row['paystatus']}
+                <span class="am-fr">{php echo date("Y-m-d H:i",$row['endtime'])} 截止</span>
+            </div>
+        </a>
+    </div>
+</li>
+{/loop}
+{/if}

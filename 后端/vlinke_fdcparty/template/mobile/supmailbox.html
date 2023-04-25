@@ -1,0 +1,192 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="{php echo $this->createMobileUrl('suphome');}">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">书记信箱</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supmailbox',array('op'=>'log'));}">
+        记录
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl">
+<form method="post" name="myform" action="{php echo $this->createMobileUrl('supmailbox',array('op'=>'post'));}" class="am-form" data-am-validator>
+	
+    {if empty($luser)}
+    <input type="hidden" name="luserid" value="0" />
+    {else}
+	<div class="am-form-group">
+        <!-- <label>选择收信领导</label> -->
+        {loop $brancharr $brow}
+        	<table class="am-table am-table-bordered">
+				<tr>
+					<th colspan="3">{$brow['name']}</th>
+				</tr>
+				{loop $brow['luser'] $urow}
+				<tr>
+					<td width="40%">{$urow['realname']}</td>
+					<td width="40%">{$urow['leadname']}</td>
+    				<td width="20%">
+						<label class="am-radio am-margin-top-0 am-margin-bottom-0 am-fr">
+							<input type="radio" name="luserid" value="{$urow['id']}" data-am-ucheck required >
+						</label>
+    				</td>
+				</tr>
+				{/loop}
+			</table>
+        {/loop}
+    </div>
+    {/if}
+
+    <div class="am-form-group">
+        <label>主题</label>
+        <input type="text" class="am-form-field" name="title" value="" placeholder="输入抄送主题..." required>
+    </div>
+	<div class="am-form-group">
+        <label>姓名</label>
+        <input type="text" class="am-form-field" name="realname" value="{$user['realname']}" placeholder="输入真实姓名..." required>
+    </div>
+    <div class="am-form-group">
+        <label>手机号</label>
+        <input type="text" class="am-form-field js-pattern-mobile" name="mobile" value="{$user['mobile']}" placeholder="输入手机号..." required>
+    </div>
+
+	<div class="am-form-group">
+        <label>内容描述</label>
+        <textarea class="am-form-field" name="details" placeholder="输入内容描述..." rows="5" required></textarea>
+    </div>
+
+	<div class="am-form-group am-padding-top">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="立即提交">
+    </div>
+</form>
+</div>
+{template 'footer'}
+{elseif $op=="log"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="{php echo $this->createMobileUrl('suphome');}">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">信箱记录</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supmailbox');}">
+        写信
+    </a>
+</div>
+</header>
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+
+</ul>
+</div>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('supmailbox',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('supmailbox',array('op'=>'details','id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+            {if $row['status']==1}
+            <span class="am-badge am-badge-primary">待回复</span>
+            {elseif $row['status']==2}
+            <span class="am-badge am-badge-success">已回复</span>
+            {/if}
+            <span class="am-fr">{php echo date("Y-m-d H:i",$row['createtime']);}</span>
+        </div>
+    </div>
+</li>
+{/loop}
+{elseif $op=="details"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">信件详情</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supmailbox');}">
+        写信
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">
+				{$supmailbox['title']}
+            </h1>
+            <p class="am-article-meta">
+                {if $supmailbox['status']==1}
+                <span class="am-badge am-badge-primary">待回复</span>
+                {elseif $supmailbox['status']==2}
+				<span class="am-badge am-badge-success">已回复</span>
+                {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $supmailbox['createtime']);}</span>
+            </p>
+        </div>
+		<blockquote><p>联系方式：{$supmailbox['realname']} - {$supmailbox['mobile']}</p></blockquote>
+        <div class="am-article-bd am-text-justify">
+            {php echo str_replace("\n","<br />",$supmailbox['details']);}
+        </div>
+		{if $supmailbox['status']==2}
+        <blockquote><p>回复内容</p></blockquote>
+        <div class="am-article-bd am-text-justify">
+            {php echo str_replace("\n","<br />",$supmailbox['reply']);}
+        </div>
+        {/if}
+        <hr class="am-article-divider">
+    </article>
+</div>
+
+{template 'footer'}
+{/if}

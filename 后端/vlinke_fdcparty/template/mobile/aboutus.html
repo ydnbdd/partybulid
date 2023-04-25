@@ -1,0 +1,42 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">关于我们</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">关于我们</h1>
+            <p class="am-article-meta">
+                {$param['title']}
+            </p>
+        </div>
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($param['aboutus'], ENT_QUOTES)}
+        </div>
+        <hr class="am-article-divider">
+        
+        {loop $telarr $row}
+        <blockquote><p>{$row['name']}<strong class="am-fr"><a href="tel:{$row['phone']}">{$row['phone']}</a></strong>
+        </p></blockquote>
+        {/loop}
+        
+        <hr class="am-article-divider">
+        <hr class="am-article-divider">
+
+    </article>
+</div>
+{template 'footer'}
+{/if}

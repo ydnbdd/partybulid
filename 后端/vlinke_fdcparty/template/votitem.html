@@ -1,0 +1,148 @@
+{template 'common/header'}
+<ul class="we7-page-tab">
+<li><a href="{php echo $this->createWebUrl('votproject');}">投票活动管理</a></li>
+<li class="active"><a href="{php echo $this->createWebUrl('votitem');}">稿件管理 </a></li>
+<li><a href="{php echo $this->createWebUrl('votlog');}">投票记录 </a></li>
+</ul>
+
+<div class="btn-group we7-margin-bottom">
+<a class="btn btn-default {php echo $op=='display'?'active':'';}" href="{php echo $this->createWebUrl('votitem');}">稿件管理</a>
+<a class="btn btn-default {php echo $op=='post'?'active':'';}" href="{php echo $this->createWebUrl('votitem',array('op'=>'post','id'=>$id));}">添加&编辑稿件</a>
+</div>
+
+{if $op == 'display'}
+<div class="panel panel-default">
+<div class="panel-heading">筛选</div>
+<div class="panel-body">
+    <form action="" method="get" class="form-horizontal form" role="form">
+    <input type="hidden" name="c" value="site" />
+    <input type="hidden" name="a" value="entry" />
+    <input type="hidden" name="m" value="vlinke_fdcparty" />
+    <input type="hidden" name="do" value="votitem" />
+    <input type="hidden" name="op" value="display" />
+    <div class="form-group">
+        <label class="col-sm-2 control-label">关键词</label>
+        <div class="col-sm-10">
+            <input class="form-control" name="keywords" type="text" value="{$keywords}" placeholder="请输入稿件标题关键词...">
+            <div class="help-block"></div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">项目</label>
+        <div class="col-sm-4">
+            <select class="form-control" name="projectid">
+                <option value="0" {if $projectid==0}selected{/if}>全部</option>
+                {loop $votproject $row}
+                <option value="{$row['id']}" {if $row['id']==$projectid} selected {/if}>{$row['title']}</option>
+                {/loop}
+            </select>
+        </div>
+        <div class="col-sm-6">
+            <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+			<button class="btn btn-default" name="output" value="1"><i class="fa fa-file"></i> 导出</button>
+            <button type="button" class="btn btn-default">总记录数：{$total}</button>
+        </div>
+    </div>
+    </form>
+</div>
+</div>
+
+<table class="table we7-table table-hover vertical-middle">
+    <thead class="navbar-inner">
+        <tr>
+            <th style="width:15%;">编号</th>
+            <th style="width:40%;">稿件标题/项目</th>
+            <th style="width:15%;">得票数</th>
+            <th style="width:30%;text-align:right;">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $list $row}
+        <tr>
+            <td>{$row['itemno']}</td>
+            <td>
+                <p>{$row['title']}</p>
+                {$votproject[$row['projectid']]['title']}
+            </td>
+            <td>{$row['vnumber']}</td>
+            <td style="text-align:right;">
+                <a class="btn btn-primary btn-sm" href="{php echo $this->createWebUrl('votlog',array('itemid'=>$row['id']));}"><i class="fa fa-user"></i> 投票记录</a>
+                <a class="btn btn-success btn-sm" href="{php echo $this->createWebUrl('votitem',array('op'=>'post','id'=>$row['id']));}"><i class="fa fa-edit"></i> 修改</a>
+                <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('votitem',array('op'=>'delete','id'=>$row['id']));}"  onclick="return confirm('删除后不可恢复，并同时删除其稿件及投票记录，确定要删除吗?')"><i class="fa fa-times"></i> 删除</a>
+            </td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>
+<div class="text-right">{$pager}</div>
+
+
+{elseif $op == 'post'}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+<input type="hidden" name="c" value="site" />
+<input type="hidden" name="a" value="entry" />
+<input type="hidden" name="m" value="vlinke_fdcparty" />
+<input type="hidden" name="do" value="votitem" />
+<input type="hidden" name="op" value="post" />
+<input type="hidden" name="id" value="{$id}" />
+<div class="panel panel-default">
+    <div class="panel-heading">
+        稿件信息设置
+    </div>
+    <div class="panel-body">
+		
+		<div class="form-group">
+		    <label class="col-sm-2 control-label">项目</label>
+		    <div class="col-sm-10">
+				<select class="form-control" name="projectid">
+				    {loop $votproject $row}
+				    <option value="{$row['id']}" {if $row['id']==$votitem['projectid']} selected {/if}>{$row['title']}</option>
+				    {/loop}
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+		    <label class="col-sm-2 control-label">编号</label>
+		    <div class="col-sm-10">
+		        <input type="text" name="itemno" class="form-control" value="{$votitem['itemno']}" />
+		        <div class="help-block"></div>
+		    </div>
+		</div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">标题</label>
+            <div class="col-sm-10">
+                <input type="text" name="title" class="form-control" value="{$votitem['title']}" />
+                <div class="help-block"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">标题图</label>
+            <div class="col-sm-10">
+                {php echo tpl_form_field_image('tilpic',$votitem['tilpic']);}
+                <div class="help-block">建议尺寸750*400</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> 详细内容</label>
+            <div class="col-sm-10">
+                {php echo tpl_ueditor('details', $votitem['details']);}
+                <div class="help-block"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> 得票数</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="vnumber" value="{$votitem['vnumber']}">
+                <div class="help-block"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group col-sm-12">
+    <input type="hidden" name="token" value="{$_W['token']}" />
+    <input type="submit" name="submit" value="提交" class="btn btn-primary btn-submit" />
+</div>
+</form>
+
+{/if}
+{template 'common/footer'}

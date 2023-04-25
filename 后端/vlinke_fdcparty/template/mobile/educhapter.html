@@ -1,0 +1,216 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">章节学习</h1>
+
+<div class="am-header-right am-header-nav" style="margin-right: 40px;">
+    <a href="javascript:$('.edusearch-box').slideToggle();">
+        <i class="am-header-icon am-icon-search"></i>
+    </a>
+</div>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>0));}">
+                    全部课程
+                </a>
+            </li>
+            {loop $educatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<!-- 搜索 -->
+<div class="am-container am-topbar-fixed-top am-padding-top-sm edusearch-box">
+<form method="get" action="" class="am-form am-form-inline">
+<input type="hidden" name="c" value="entry" />
+<input type="hidden" name="i" value="{$_W['uniacid']}" />
+<input type="hidden" name="m" value="vlinke_fdcparty" />
+<input type="hidden" name="do" value="educate" />
+    <div class="am-input-group">
+        <input type="text" name="keywords" class="am-form-field" value="{$keywords}" placeholder="请输入搜索的课程标题...">
+        <span class="am-input-group-btn">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <button class="am-btn am-btn-default" type="submit"><span class="am-icon-search"></span></button>
+        </span>
+    </div>
+</form>
+
+<ul class="am-avg-sm-3 am-thumbnails am-padding-top-sm">
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'nostudy'));}" class="am-btn am-btn-primary am-btn-block">未学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'dostudy'));}" class="am-btn am-btn-primary am-btn-block">正在学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'okstudy'));}" class="am-btn am-btn-primary am-btn-block">已完成</a>
+    </li>
+</ul>
+</div>
+
+
+<div class="am-progress am-progress-xs am-margin-bottom-0"  data-am-sticky="{top:49}" style="z-index:9;">
+    <div class="am-progress-bar am-progress-bar-success" id="studypro" style="width: 0%"></div>
+</div>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$educhapter['title']}</h1>
+            <p class="am-article-meta">
+                {php echo date("Y-m-d H:i", $educhapter['createtime']);}&nbsp;
+                <span class="am-fr" id="stustatus">{php echo $edulog['status']==1?"未完成":"已完成";}</span>
+            </p>
+        </div>
+
+        {if !empty($educhapter['apath'])}
+        <div class="am-article-bd am-text-center">
+            <audio src="{php echo tomedia($educhapter['apath']);}" controls="controls" style="width: 100%;">
+            Your browser does not support the audio element.
+            </audio>
+        </div>
+        <hr class="am-article-divider am-margin-top-0">
+        {/if}
+
+        {if !empty($educhapter['vpath'])}
+        <div class="am-article-bd am-text-center">
+            <video src="{php echo tomedia($educhapter['vpath']);}" controls="controls" poster="{php echo tomedia($edulesson['tilpic']);}" style="width: 100%;">
+            Your browser does not support the video element.
+            </video>
+        </div>
+        <hr class="am-article-divider am-margin-top-0">
+        {/if}
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($educhapter['details'], ENT_QUOTES)}
+        </div>
+
+        <hr class="am-article-divider">
+    </article>
+</div>
+
+<script type="text/javascript">
+var stutime = {$edulog['stutime']};
+var needtime = {$educhapter['needtime']};
+var width = Math.trunc((stutime/needtime) * 100);
+var upten = stutime;
+$(function() {
+    $("#studypro").css("width", width + "%");
+})
+</script>
+
+{if $edulog['status']==1 }
+<script type="text/javascript">
+var funtime = setInterval(function () {
+    stutime = stutime + 1;
+    $("#stutime").html("剩余："+(needtime-stutime)+"s");
+    width = Math.trunc((stutime/needtime) * 100);
+    width = width>100 ? 100 : width;
+    $("#studypro").css("width", width + "%");
+    if (stutime>=upten+10 || stutime>=needtime) {
+        upten = stutime;
+        setStutime(stutime);
+        if (stutime>=needtime) {
+            clearInterval(funtime);
+            $("#stustatus").html("已完成");
+            $("#badgestatus{$educhapter['id']}").html("已完成");
+            $("#badgestatus{$educhapter['id']}").addClass("am-badge-success");
+            $("#stutime").html("已完成");
+        }
+    }
+}, 1000);
+function setStutime(stutime) {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('educhapter',array('op'=>'stutime','chapterid'=>$educhapter['id'],'logid'=>$edulog['id'],'needtime'=>$educhapter['needtime']));}",
+        data: {stutime:stutime},
+        async: false,
+        cache: false,
+        success: function(ret){//ajax成功时执行
+            console.log(ret);
+        }
+    }); 
+}
+</script>
+{/if}
+
+<div data-am-widget="titlebar" class="am-titlebar bg-fff am-titlebar-multi">
+    <h2 class="am-titlebar-title">章节目录</h2>
+    <nav class="am-titlebar-nav">
+        <a href="{php echo $this->createMobileUrl('edulesson',array('id'=>$educhapter['lessonid']));}">返回课程页</a>
+    </nav>
+</div>
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+{loop $educhapterall $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('educhapter',array('id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+            所需时长：{$row['needtime']} s
+
+            {if $edulogall[$row['id']]['status']==2}
+            <span class="am-badge am-badge-success am-fr" id="badgestatus{$row['id']}">已完成</span>
+            {else}
+            <span class="am-badge am-fr" id="badgestatus{$row['id']}">未完成</span>
+            {/if}
+        </div>
+    </div>
+</li>
+{/loop}
+</ul>
+<p class="am-text-center am-text-sm am-link-muted am-margin-bottom-0 am-padding-bottom">~~已加载完~~</p>
+</div>
+</div>
+
+<p class="am-margin-top-0 am-margin-bottom"> &nbsp; </p>
+
+<div class="am-g am-g-fixed educhapter-foot">
+    <div class="am-u-sm-4">
+        {if empty($prev)}
+        <a href="JavaScript:;">已是首章</a>
+        {else}
+        <a href="{php echo $this->createMobileUrl('educhapter',array('id'=>$prev['id']));}">上一章</a>
+        {/if}
+    </div>
+    <div class="am-u-sm-4" id="stutime">
+        {if $edulog['status']==2 }已完成{else}剩余：{$educhapter['needtime']}s{/if}
+    </div>
+    <div class="am-u-sm-4">
+        {if empty($next)}
+        <a href="JavaScript:;">已是尾章</a>
+        {else}
+        <a href="{php echo $this->createMobileUrl('educhapter',array('id'=>$next['id']));}">下一章</a>
+        {/if}
+    </div>
+</div>
+
+
+{template 'footer'}
+{/if}

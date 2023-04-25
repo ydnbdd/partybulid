@@ -1,0 +1,115 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+<li class="active"><a href="{php echo $this->createWebUrl('mailbox');}">书记信箱 </a></li>
+</ul>
+{if $op=='display'}
+
+<div class="panel panel-default">
+<div class="panel-heading">筛选</div>
+<div class="panel-body">
+<form action="" method="get" class="form-horizontal form" role="form">
+<input type="hidden" name="c" value="site" />
+<input type="hidden" name="a" value="entry" />
+<input type="hidden" name="m" value="vlinke_bparty" />
+<input type="hidden" name="do" value="mailbox" />
+    <div class="form-group">
+        <label class="col-sm-2 control-label">用户ID</label>
+        <div class="col-sm-4">
+            {php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $starttime),'endtime'=>date('Y-m-d', $endtime)),false);}
+        </div>
+        <div class="col-sm-6">
+            <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+            <button class="btn btn-default" name="output" value="1"><i class="fa fa-file"></i> 导出</button>
+            <button type="button" class="btn btn-default">总记录数：{$total}</button>
+        </div>
+    </div>
+</form>
+</div>
+</div>
+
+<div class="panel panel-default">
+<table class="table table-hover">
+<thead class="navbar-inner">
+    <tr>
+        <th style="width:10%;">ID</th>
+        <th style="width:10%;">头像</th>
+        <th style="width:25%;">信息</th>
+        <th style="width:25%;">单位</th>
+        <th style="width:15%;">创建时间</th>
+        <th style="width:15%; text-align:right;">操作</th>
+    </tr>
+</thead>
+<tbody>
+    {loop $list $row}
+    <tr> 
+        <td><input type="checkbox" name="check" value="{$row['id']}"> {$row['id']}</td>
+        <td><img class="img-responsive" style="max-width:52px;" src="{php echo tomedia($row['user']['headimgurl']);}"/></td>
+        <td>
+            <p>{$row['user']['nickname']}</p>
+            {$row['realname']}-{$row['mobile']}
+        </td>
+        <td>{$row['department']}</td>
+        <td>{php echo date('Y-m-d H:i',$row['createtime'])}</td>
+        <td class="text-right">
+            <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('mailbox',array('op'=>'delete','id'=>$row['id']))}" onclick="return confirm('删除后不可恢复,确定要删除吗?')">删除</a>
+        </td>
+    </tr>
+    <tr> 
+        <td>&nbsp;</td>
+        <td colspan="5"><strong>内容描述：</strong>{$row['content']}</td>
+    </tr>
+    {/loop}
+    <tr>
+        <td class="text-left" colspan="6">
+          <span class="btn btn-success btn-sm checkall" id="checkall"><i class="icon-edit"></i>全选</span>
+          <span class="btn btn-success btn-sm uncheckall" id="uncheckall"><i class="icon-edit"></i>全不选</span>
+          <input type="button" class="btn btn-primary btn-sm deleteall" id="deleteall" name="deleteall" value="删除选择的" />
+        </td>
+    </tr>
+</tbody>
+</table>
+</div>
+
+<div class="pull-right">
+    {$pager}
+</div>
+<script>
+$(function(){
+   
+    $('.checkall').bind('click',function(){
+        $("input[name='check']").each(function(){
+           $(this).prop("checked","checked");
+        });
+    });
+    $('.uncheckall').bind('click',function(){
+        $("input[name='check']").each(function(){
+           $(this).prop("checked",false);
+        });
+    });
+
+    $('#deleteall').click(function(){
+        var check = $("input:checked");
+        if(check.length<1){
+            alert("请选择要删除的记录!");
+            return false;
+        }
+        if(confirm("确认要删除选择的记录?")){
+            var id = new Array();
+            check.each(function(i){ id[i] = $(this).val(); });
+            $.post("<?php echo $this->createWebUrl('mailbox',array('op'=>'deleteall')); ?>",{idArr:id},         
+                function(data){
+                    if(data == '0'){
+                       alert('没有选择编号！');
+                       location.reload();
+                    }else{
+                       alert('删除成功！');
+                       location.reload();
+                    }
+                }
+            );
+        }
+    });
+});
+</script>
+{/if}
+{template 'common/footer'}

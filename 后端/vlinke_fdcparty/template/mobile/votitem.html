@@ -1,0 +1,30 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">民主投票</h1>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">【{$votitem['itemno']}】{$votitem['title']}</h1>
+            <p class="am-article-meta am-text-danger">
+                得票数：{$votitem['vnumber']}
+            </p>
+        </div>
+		<hr class="am-article-divider am-margin-vertical-sm">
+        <div class="am-article-bd am-text-justify">
+			<img style="width: 100%;" src="{$votitem['tilpic']}" />
+            {php echo html_entity_decode($votitem['details'], ENT_QUOTES)}
+        </div>
+
+    </article>
+</div>
+
+{template 'footer'}
+{/if}

@@ -1,0 +1,223 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">{if empty($sercate)}全部志愿服务{else}{$sercate['name']}{/if}</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('sercate',array('cateid'=>0));}">
+                    全部志愿服务
+                </a>
+            </li>
+            {loop $sercatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('sercate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$seritem['title']}</h1>
+            <p class="am-article-meta">
+                {if empty($branch)} {$param['nicktil']} {else} {$branch['name']} {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $seritem['createtime']);}</span>
+            </p>
+        </div>
+
+        <blockquote><p>我有话说
+            <a class="am-fr" href="{php echo $this->createMobileUrl('seritem',array('id'=>$itemid));}"><strong>返回志愿服务页</strong></a>
+        </p></blockquote>
+        <div class="am-form-group">
+            <textarea class="am-form-field" name="details" id="details" placeholder="输入你想说的..." rows="5"></textarea>
+        </div>
+        <div class="am-form-group am-form-file">
+            <button type="button" class="am-btn am-btn-default am-btn-block am-btn-sm">
+            <i class="am-icon-cloud-upload"></i> 选择要上传的图片</button>
+            <input type="file" id="formfileimage" accept="image/*">
+        </div>
+        <ul class="am-avg-sm-5 am-thumbnails upimage-all" id="image-list">
+        </ul>
+        <div class="am-form-group am-padding-top-0">
+            <button type="button" class="am-btn am-btn-success am-btn-block" id="subBtn" onclick="javascript:setMessage();">立即提交</button>
+        </div>
+        <hr class="am-article-divider" id="sermessageall">
+
+        <blockquote><p>看看大家都说了什么</strong><strong class="am-fr">{$sermessagetol} 条留言</strong></p></blockquote>
+
+        <ul class="am-comments-list am-comments-list-flip" id="list">
+        </ul>
+
+        <hr class="am-article-divider">
+    </article>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+
+<script>
+$(function() {
+    $('#formfileimage').change(function() {
+        var formData = new FormData();
+        formData.append('upfile', $('input[id=formfileimage]')[0].files[0]);
+        $.ajax({ 
+            url: "{php echo $this->createMobileUrl('uploadimage');}",
+            data: formData,
+            type: 'POST',
+            async: false,
+            cache: false,
+            processData : false, 
+            contentType : false,
+            dataType: 'json',
+            beforeSend:function(){},//触发ajax请求开始时执行
+            success: function(ret){//ajax成功时执行
+                console.log(ret);
+                if (ret['success']) {
+                    var html = '';
+                    html += '<li>';
+                    html += '<a href="javascript:;" class="am-close am-close-alt am-icon-times"></a>';
+                    html += '<img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}'+ret['path']+'" />';
+                    html += '<input type="hidden" name="picall[]" value="'+ret['path']+'" />';
+                    html += '</li>';
+                    $('#image-list').append(html);
+                }
+            },
+            error:function(){},//ajax发生错误时执行
+            complete:function(){}//ajax请求完成时执行
+        });
+    });
+});
+$("#image-list").on("click","li a",function(){
+    $(this).parent().remove();
+})
+</script>
+
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('sermessage',array('op'=>'getmore','itemid'=>$itemid));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+                $.AMUI.gallery.init();
+            }
+        },
+    }); 
+}
+
+function funDelete(id) {
+    if(confirm("删除后不可恢复，你确定要删除吗?")){
+        $.ajax({
+            type: 'POST',
+            url: "{php echo $this->createMobileUrl('sermessage',array('op'=>'delete'));}",
+            data: {id:id},
+            dataType: 'JSON',
+            success: function(ret){
+                console.log(ret);
+                if (ret['status'] == 'error') {
+                    alert(ret['msg']);
+                }else{
+                    alert(ret['msg']);
+                    $("#sermessagebox"+id).remove();
+                }
+            },
+        }); 
+    }
+}
+
+function setMessage() {
+    var details = $("#details").val();
+    var picall = $("input[name^='picall']").map(function(){return $(this).val()}).get();
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('sermessage',array('op'=>'post','itemid'=>$itemid));}",
+        data: {details:details,picall:picall},
+        dataType: 'JSON',
+        beforeSend:function(){
+            $("#subBtn").attr('disabled',"disabled");
+        },
+        success: function(ret){
+            console.log(ret);
+            if (ret['status'] == 'error') {
+                alert(ret['msg']);
+            }else{
+                alert(ret['msg']);
+                location.href = "{php echo $this->createMobileUrl('sermessage',array('itemid'=>$itemid));}";
+            }
+        },
+        complete:function(){
+            $("#subBtn").removeAttr('disabled');
+        }
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-comment" id="sermessagebox{$row['id']}">
+    <article class="am-comment">
+        <img src="{php echo tomedia($row['headpic']);}" class="am-comment-avatar" width="48" height="48"/>
+        <div class="am-comment-main">
+            <header class="am-comment-hd">
+                <div class="am-comment-meta">
+                    <a href="javascript:;" class="am-comment-author">{$row['realname']}</a>
+                    留言于 <time>{php echo date("Y-m-d H:i",$row['createtime'])}</time>
+                </div>
+                {if $row['userid']==$user['id']}
+                <div class="am-comment-actions">
+                    <a href="javascript:funDelete({$row['id']});">
+                        <i class="am-icon-close"></i>
+                    </a>
+                </div>
+                {/if}
+            </header>
+            <div class="am-comment-bd am-text-justify am-text-sm">
+                {php echo str_replace("\n","<br />",$row['details']);}
+                {if !empty($row['picall'])}
+                <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-margin-top-xs am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+                    {loop $row['picall'] $pic}
+                    <li><img src="{php echo tomedia($pic);}" /></li>
+                    {/loop}
+                </ul>
+                {/if}
+            </div>
+        </div>
+    </article>
+</li>
+{/loop}
+{/if}

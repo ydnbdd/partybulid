@@ -1,0 +1,139 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">每日签到</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-text-center am-padding-top-xl am-text-xl">
+	{php echo date("Y年m月d日", time());}
+</div>
+
+<div class="sigbtn">
+	{if empty($signlog)}
+	<a href="{php echo $this->createMobileUrl('sighome',array('op'=>'setsign'));}" class="am-icon-btn">签到</a>
+	{else}
+	<a href="javascript:;" class="am-icon-btn">已签到</a>
+	{/if}
+</div>
+
+<div class="am-text-center am-padding-top-xl am-padding-bottom-xl am-text-sm am-link-muted">
+	已连续签到 {php echo empty($signlog) ? 0 : $signlog['number'];} 次，<a href="{php echo $this->createMobileUrl('sighome',array('op'=>'siglog'));}" style="color: #436EEE;">我的签到记录</a>
+</div>
+
+<div class="sighome-box">
+	<div class="sighome-til">今日签到</div>
+	<ul class="sighome-con" id="list">
+	</ul>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('sighome',array('op'=>'daygetmore'));}",
+        data: {page:page},
+        success: function(ret){
+            console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="daygetmore"}
+{loop $list $row}
+<li>
+	<img class="headpic" src="{php echo tomedia($row['headpic']);}"/>
+	<div class="userinfo">
+		<span>{$row['realname']}</span>
+		<span class="am-fr">{php echo date('H:i',$row['createtime'])}</span>
+	</div>
+</li>
+{/loop}
+{elseif $op=="siglog"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">我的签到记录</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+<div class="sighome-box">
+	<ul class="sighome-con" id="list">
+	</ul>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('sighome',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li>
+	<img class="headpic" src="{php echo tomedia($row['headpic']);}"/>
+	<div class="userinfo">
+		<span>{$row['realname']}</span>
+		<span class="am-fr">{php echo date('Y-m-d H:i',$row['createtime'])}</span>
+	</div>
+</li>
+{/loop}
+{/if}

@@ -1,0 +1,152 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">组织活动</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container box-slider">
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $slide $row}
+        <li>
+            <a href="{$row['link']}">
+                <img src="{php echo tomedia($row['tilpic']);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+</div>
+
+{if !empty($actenroll)}
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list actenrollbox" >
+<div class="am-list-news-bd" id="actenrollbox">
+<ul class="am-list">
+{loop $actenroll $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-2 am-list-thumb">
+        <img class="am-circle" src="{php echo tomedia($row['headpic']);}"/>
+    </div>
+    <div class="am-u-sm-10 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify am-text-sm">
+            <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['activityid']));}">
+                <span class="am-text-danger">{$row['realname']}</span> 
+                <span class="am-link-muted">报名参与了</span> 
+                {$row['title']}
+            </a>
+        </h3>
+    </div>
+</li>
+{/loop}
+</ul>
+</div>
+</div>
+{if 1 < count($actenroll)}
+<script type="text/javascript">
+function AutoScroll(obj) {
+    $(obj).find("ul:first").animate({
+        marginTop: "-72px"
+    },
+    500,
+    function() {
+        $(this).css({
+            marginTop: "0px"
+        }).find("li:first").appendTo(this);
+    });
+}
+$(document).ready(function() {
+    setInterval('AutoScroll("#actenrollbox")', 5000)
+});
+</script>
+{/if}
+{/if}
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" style="margin-top: 15px !important;" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+</ul>
+</div>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('acthome',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    {if empty($row['tilpic'])}
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+            {if empty($branch[$row['branchid']])} {$param['nicktil']} {else} {$branch[$row['branchid']]['name']} {/if}
+        </div>
+    </div>
+    {else}
+    <div class="am-u-sm-4 am-list-thumb">
+        <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['id']));}">
+            <img src="{php echo tomedia($row['tilpic']);}"/>
+        </a>
+    </div>
+    <div class="am-u-sm-8 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <a href="{php echo $this->createMobileUrl('activity',array('id'=>$row['id']));}">
+        <div class="am-list-item-text">
+            {if empty($branch[$row['branchid']])} {$param['nicktil']} {else} {$branch[$row['branchid']]['name']} {/if}
+            {if $row['status']==2}
+            <span class="am-badge am-badge-primary am-fr">报名中</span>
+            {elseif $row['status']==3}
+            <span class="am-badge am-badge-success am-fr">已结束</span>
+            {/if}
+        </div>
+        </a>
+    </div>
+    {/if}
+</li>
+{/loop}
+{/if}

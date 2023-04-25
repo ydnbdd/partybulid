@@ -1,0 +1,219 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">学习课程</h1>
+
+<div class="am-header-right am-header-nav" style="margin-right: 40px;">
+    <a href="javascript:$('.edusearch-box').slideToggle();">
+        <i class="am-header-icon am-icon-search"></i>
+    </a>
+</div>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>0));}">
+                    全部课程
+                </a>
+            </li>
+            {loop $educatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<!-- 搜索 -->
+<div class="am-container am-topbar-fixed-top am-padding-top-sm edusearch-box">
+<form method="get" action="" class="am-form am-form-inline">
+<input type="hidden" name="c" value="entry" />
+<input type="hidden" name="i" value="{$_W['uniacid']}" />
+<input type="hidden" name="m" value="vlinke_fdcparty" />
+<input type="hidden" name="do" value="educate" />
+    <div class="am-input-group">
+        <input type="text" name="keywords" class="am-form-field" value="{$keywords}" placeholder="请输入搜索的课程标题...">
+        <span class="am-input-group-btn">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <button class="am-btn am-btn-default" type="submit"><span class="am-icon-search"></span></button>
+        </span>
+    </div>
+</form>
+
+<ul class="am-avg-sm-3 am-thumbnails am-padding-top-sm">
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'nostudy'));}" class="am-btn am-btn-primary am-btn-block">未学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'dostudy'));}" class="am-btn am-btn-primary am-btn-block">正在学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'okstudy'));}" class="am-btn am-btn-primary am-btn-block">已完成</a>
+    </li>
+</ul>
+</div>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$edulesson['title']}</h1>
+            <p class="am-article-meta">
+            	{php echo date("Y-m-d H:i", $edulesson['createtime']);}&nbsp;
+                <span class="am-fr">{php echo $edulesson['stustatus']==1?"必修":"选修";}</span>
+            </p>
+        </div>
+
+        {if !empty($edulesson['apath'])}
+        <div class="am-article-bd am-text-center">
+            <audio src="{php echo tomedia($edulesson['apath']);}" controls="controls" style="width: 100%;">
+            Your browser does not support the audio element.
+            </audio>
+        </div>
+        <hr class="am-article-divider am-margin-top-0">
+        {/if}
+        {if !empty($edulesson['vpath'])}
+        <div class="am-article-bd am-text-center">
+            <video src="{php echo tomedia($edulesson['vpath']);}" controls="controls" poster="{php echo tomedia($edulesson['tilpic']);}" style="width: 100%;">
+            Your browser does not support the video element.
+            </video>
+        </div>
+        <hr class="am-article-divider am-margin-top-0">
+        {/if}
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($edulesson['details'], ENT_QUOTES)}
+        </div>
+
+        <hr class="am-article-divider">
+
+        <blockquote><p>课程状态<strong class="am-fr">{php echo $edulesson['status']==1?"更新中":"已结课";}</strong>
+        </p></blockquote>
+        <blockquote><p>课程积分<strong class="am-fr">{$edulesson['integral']} 分</strong>
+        </p></blockquote>
+        <blockquote><p>完成统计<strong class="am-fr">{php echo intval($edustudytol);} 人已完成</strong>
+        </p></blockquote>
+        <blockquote><p>个人情况
+            {if $edustudy['status']==1}
+            <strong class="am-fr am-text-danger">未完成</strong>
+            {else}
+            <strong class="am-fr am-text-success">已完成</strong>
+            {/if}
+        </p></blockquote>
+        
+        <hr class="am-article-divider">
+        
+        {if $nostu_chapterid!=0}
+        <div class="am-article-bd am-text-center">
+            <a class="am-btn am-btn-default am-btn-block" href="{php echo $this->createMobileUrl('educhapter',array('id'=>$nostu_chapterid));}"> <i class="am-icon-book"></i> 开始学习</a>
+        </div>
+        <hr class="am-article-divider">
+        {/if}
+    </article>
+</div>
+
+
+
+<div data-am-widget="tabs" class="am-tabs am-tabs-d2 bg-fff am-margin-left-0 am-margin-right-0 am-margin-bottom-0">
+	{if !empty($param['openmessage'])}
+	<a href="{php echo $this->createMobileUrl('edumessage',array('lessonid'=>$id));}" class="messagebtn">
+	    <i class="am-icon-edit"></i>
+	</a>
+    <ul class="am-tabs-nav am-cf">
+        <li class="am-active"><a href="[data-tab-panel-1]">章节目录 ({php echo count($educhapterall);})</a></li>
+        <li class=""><a href="[data-tab-panel-2]">留言评论 ({php echo count($edumessageall);})</a></li>
+    </ul>
+	{else}
+	<ul class="am-tabs-nav am-cf">
+	    <li class="am-active"><a href="[data-tab-panel-1]">章节目录 ({php echo count($educhapterall);})</a></li>
+	</ul>
+	{/if}
+    <div class="am-tabs-bd">
+
+
+<div data-am-widget="list_news" data-tab-panel-2 class="am-tab-panel am-active am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list">
+{loop $educhapterall $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('educhapter',array('id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+            所需时长：{$row['needtime']} s
+
+            {if $edulogall[$row['id']]['status']==2}
+            <span class="am-badge am-badge-success am-fr">已完成</span>
+            {else}
+            <span class="am-badge am-fr">未完成</span>
+            {/if}
+        </div>
+    </div>
+</li>
+{/loop}
+</ul>
+<p class="am-text-center am-text-sm am-link-muted">~~已加载完~~</p>
+</div>
+</div>
+
+<div data-tab-panel-1 class="am-tab-panel">
+<ul class="am-comments-list am-comments-list-flip" id="list">
+    {loop $edumessageall $row}
+    <li class="am-comment">
+        <article class="am-comment">
+            
+            <img src="{php echo tomedia($row['headpic']);}" class="am-comment-avatar" width="48" height="48"/>
+
+            <div class="am-comment-main">
+                <header class="am-comment-hd">
+                    <div class="am-comment-meta">
+                        <a href="#link-to-user" class="am-comment-author">{$row['realname']}</a>
+                        评论于 <time>{php echo date("Y-m-d H:i",$row['createtime'])}</time>
+                    </div>
+                </header>
+                <div class="am-comment-bd am-text-justify am-text-sm">
+                    {php echo str_replace("\n","<br />",$row['details']);}
+                    {if !empty($row['picall'])}
+                    <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-margin-top-xs am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+                        {loop $row['picall'] $index $pic}
+                        <li>
+                            <img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}{$pic}" />
+                        </li>
+                        {/loop}
+                    </ul>
+                    {/if}
+                </div>
+            </div>
+        </article>
+    </li>
+    {/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('edumessage',array('lessonid'=>$id));}" class="am-btn am-btn-default am-btn-block">查看更多留言</a>
+</div>
+
+
+    </div>
+</div>
+
+
+
+
+
+{template 'footer'}
+{/if}

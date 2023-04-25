@@ -1,0 +1,103 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">积分排行</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div data-am-widget="titlebar" class="am-titlebar am-titlebar-multi am-margin-0" style="position: relative;">
+    <h2 class="am-titlebar-title" style="width: 100%;">
+        按{$itypestr}度【{$ivalue}】
+    </h2>
+
+    <nav data-am-widget="menu" class="am-menu am-menu-offcanvas2 itypebox iyearbox" data-am-menu-offcanvas> 
+    <a href="javascript: void(0)" class="am-menu-toggle">按年度</a>
+    <div class="am-offcanvas">
+        <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+            <ul class="am-menu-nav am-avg-sm-3">
+                {loop $iyeararr $row}
+                <li><a href="{php echo $this->createMobileUrl('intrank',array('itype'=>'iyear','ivalue'=>$row));}">{$row}</a></li>
+                {/loop}
+            </ul>
+        </div>
+    </div>
+    </nav>
+
+    <nav data-am-widget="menu" class="am-menu am-menu-offcanvas1 itypebox iseasonbox" data-am-menu-offcanvas> 
+    <a href="javascript: void(0)" class="am-menu-toggle">按季度</a>
+    <div class="am-offcanvas" >
+        <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+            <ul class="am-menu-nav am-avg-sm-1">
+                {loop $iyeararr $yrow}
+                <li class="am-parent">
+                    <a href="javascript:;">{$yrow}</a>
+                    <ul class="am-menu-sub am-collapse am-avg-sm-4 {if substr($ivalue,0,4)==$yrow}am-in{/if}">
+                        {loop $iseasonarr $srow}
+                        <li>
+                        <a href="{php echo $this->createMobileUrl('intrank',array('itype'=>'iseason','ivalue'=>$yrow.$srow));}">
+                            {$srow}季度
+                        </a>
+                        </li>
+                        {/loop}
+                    </ul>
+                </li>
+                {/loop}
+            </ul>
+        </div>
+    </div>
+    </nav>
+
+    <nav data-am-widget="menu" class="am-menu am-menu-offcanvas1 itypebox imonthbox" data-am-menu-offcanvas> 
+    <a href="javascript: void(0)" class="am-menu-toggle">按月度</a>
+    <div class="am-offcanvas" >
+        <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+            <ul class="am-menu-nav am-avg-sm-1">
+                {loop $iyeararr $yrow}
+                <li class="am-parent">
+                    <a href="javascript:;">{$yrow}</a>
+                    <ul class="am-menu-sub am-collapse am-avg-sm-4 {if substr($ivalue,0,4)==$yrow}am-in{/if}">
+                        {loop $imontharr $mrow}
+                        <li>
+                        <a href="{php echo $this->createMobileUrl('intrank',array('itype'=>'imonth','ivalue'=>$yrow.str_pad($mrow,2,'0',STR_PAD_LEFT)));}">
+                            {php echo str_pad($mrow,2,"0",STR_PAD_LEFT);}月
+                        </a>
+                        </li>
+                        {/loop}
+                    </ul>
+                </li>
+                {/loop}
+            </ul>
+        </div>
+    </div>
+    </nav>
+</div>
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list intrank-list" id="list">
+{loop $list $key $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <span class="am-fr">{php echo intval($row['intsum']);}</span>
+            <span class="am-badge am-round">{php echo ++$key;}</span> &nbsp;&nbsp;
+            {$row['realname']}
+        </h3>
+    </div>
+</li>
+{/loop}
+</ul>
+<p class="am-padding-bottom-lg am-text-center am-text-sm am-link-muted">~~~ 已加载完 ~~~</p>
+</div>
+</div>
+{template 'footer'}
+{/if}

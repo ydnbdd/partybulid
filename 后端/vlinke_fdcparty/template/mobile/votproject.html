@@ -1,0 +1,137 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">民主投票</h1>
+</header>
+
+
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $votproject['picall'] $row}
+        <li>
+            <a href="JavaScript:;">
+                <img src="{php echo tomedia($row);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$votproject['title']}</h1>
+            <p class="am-article-meta">
+                投票时间：{$votproject['starttime']} 至 {$votproject['endtime']}
+            </p>
+        </div>
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($votproject['details'], ENT_QUOTES)}
+        </div>
+
+    </article>
+</div>
+
+<form method="post" name="votform" action="{php echo $this->createMobileUrl('votproject',array('op'=>'setvote','projectid'=>$votproject['id']));}" class="am-form" onsubmit="return validate_form(this)">
+
+<div class="am-container am-padding-top am-margin-top bg-fff">
+	<div class="am-g" id="list">
+		
+	</div>
+</div>
+
+
+<div class="am-container am-padding-top am-padding-bottom">
+	<button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<div class="am-padding-vertical-lg"></div>
+<div class="am-g am-g-fixed bg-fff educhapter-foot am-padding-vertical-sm">
+    <div class="am-u-sm-12">
+		{if $canvote==1}
+		<button class="am-btn am-btn-block" disabled="disabled">投票还未开始</button>
+		{elseif $canvote==2}
+		<input type="hidden" name="token" value="{$_W['token']}" />
+		<input type="submit" name="submit" class="am-btn am-btn-danger am-btn-block" value="立即投票">
+		{elseif $canvote==3}
+		<button class="am-btn am-btn-block" disabled="disabled">投票已结束</button>
+		{/if}
+    </div>
+</div>
+</form>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('votproject',array('op'=>'getmore','projectid'=>$votproject['id']));}", 
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+
+var ptype = parseInt({$votproject['ptype']});
+var minnumber = parseInt({$votproject['minnumber']});
+var maxnumber = parseInt({$votproject['maxnumber']});
+function validate_form () {
+	var check = $("input:checked");
+	if(check.length<1){
+		alert("请选择要投的选项。");
+		return false;
+	}
+	if (ptype==2){
+		if (check.length<minnumber || check.length>maxnumber){
+			alert("本次投票活动最少要选择"+minnumber+"项，最多不能超过"+maxnumber+"项，请检查你的选项个数。");
+			return false;
+		}
+	}
+	return true;
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+
+    <div class="am-u-sm-6 am-u-end am-margin-bottom">
+		<a href="{php echo $this->createMobileUrl('votitem',array('id'=>$row['id']));}">
+		    <img class="am-img-thumbnail" src="{php echo tomedia($row['tilpic']);}"/>
+		</a>
+        <h3 class="am-list-item-hd am-text-justify am-text-sm am-text-truncate am-margin-bottom-xs">
+            <a href="{php echo $this->createMobileUrl('votitem',array('id'=>$row['id']));}">
+                【{$row['itemno']}】{$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+			{if $votproject['ptype']==1}
+			<input type="radio" name="itemval[]" value="{$row['id']}">
+			{elseif $votproject['ptype']==2}
+            <input type="checkbox" name="itemval[]" value="{$row['id']}">
+			{/if}
+			<span class="am-badge am-badge-danger am-fr">票数：{$row['vnumber']}</span>
+        </div>
+    </div>
+
+{/loop}
+{/if}

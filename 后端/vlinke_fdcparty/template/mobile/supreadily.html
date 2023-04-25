@@ -1,0 +1,191 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="{php echo $this->createMobileUrl('suphome');}">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">随手拍</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supreadily',array('op'=>'log'));}">
+        记录
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl">
+<form method="post" name="myform" action="{php echo $this->createMobileUrl('supreadily',array('op'=>'post'));}" class="am-form" data-am-validator>
+    
+    <div class="am-form-group">
+        <label>主题</label>
+        <input type="text" class="am-form-field" name="title" value="" placeholder="输入上报主题..." required>
+    </div>
+
+    <div class="am-form-group">
+        <label>内容描述</label>
+        <textarea class="am-form-field" name="details" placeholder="输入内容描述..." rows="5"></textarea>
+    </div>
+    <div class="am-form-group am-form-file">
+        <button type="button" class="am-btn am-btn-default am-btn-block am-btn-sm">
+        <i class="am-icon-cloud-upload"></i> 选择要上传的图片</button>
+        <input type="file" id="formfileimage" accept="image/*">
+    </div>
+    <ul class="am-avg-sm-5 am-thumbnails upimage-all" id="image-list">
+    </ul>
+
+    <div class="am-form-group am-padding-top">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="立即提交">
+    </div>
+</form>
+</div>
+
+
+<script>
+$(function() {
+    $('#formfileimage').change(function() {
+        var formData = new FormData();
+        formData.append('upfile', $('input[id=formfileimage]')[0].files[0]);
+        $.ajax({ 
+            url: "{php echo $this->createMobileUrl('uploadimage');}",
+            data: formData,
+            type: 'POST',
+            async: false,
+            cache: false,
+            processData : false, 
+            contentType : false,
+            dataType: 'json',
+            beforeSend:function(){},//触发ajax请求开始时执行
+            success: function(ret){//ajax成功时执行
+                console.log(ret);
+                if (ret['success']) {
+                    var html = '';
+                    html += '<li>';
+                    html += '<a href="javascript:;" class="am-close am-close-alt am-icon-times"></a>';
+                    html += '<img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}'+ret['path']+'" />';
+                    html += '<input type="hidden" name="picall[]" value="'+ret['path']+'" />';
+                    html += '</li>';
+                    $('#image-list').append(html);
+                }
+            },
+            error:function(){},//ajax发生错误时执行
+            complete:function(){}//ajax请求完成时执行
+        });
+    });
+});
+$("#image-list").on("click","li a",function(){
+    $(this).parent().remove();
+})
+</script>
+{template 'footer'}
+{elseif $op=="log"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="{php echo $this->createMobileUrl('suphome');}">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">随手拍记录</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supreadily');}">
+        发布
+    </a>
+</div>
+</header>
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+
+</ul>
+</div>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('supreadily',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify">
+            <a href="{php echo $this->createMobileUrl('supreadily',array('op'=>'details','id'=>$row['id']));}">
+                {$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+            <span>{php echo date("Y-m-d H:i",$row['createtime']);}</span>
+        </div>
+    </div>
+</li>
+{/loop}
+{elseif $op=="details"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">随手拍详情</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('supreadily');}">
+        发布
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">
+                {$supreadily['title']}
+            </h1>
+            <p class="am-article-meta">
+                <span>{php echo date("Y-m-d H:i", $supreadily['createtime']);}</span>
+            </p>
+        </div>
+        <div class="am-article-bd am-text-justify">
+            {php echo str_replace("\n","<br />",$supreadily['details']);}
+        </div>
+        <div class="am-article-bd am-text-justify">
+            {loop $supreadily['picall'] $row}
+            <img class="am-img-responsive am-img-thumbnail am-margin-vertical-sm" src="{php echo tomedia($row);}">
+            {/loop}
+        </div>
+        <hr class="am-article-divider">
+    </article>
+</div>
+
+{template 'footer'}
+{/if}

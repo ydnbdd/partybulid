@@ -1,0 +1,249 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">组织活动</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$activity['title']}</h1>
+            <p class="am-article-meta">
+                {if empty($branch)} {$param['nicktil']} {else} {$branch['name']} {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $activity['createtime']);}</span>
+            </p>
+        </div>
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($activity['details'], ENT_QUOTES)}
+        </div>
+
+        <div class="am-article-lead am-margin-bottom act-info">
+            <p>联系人：{$actuser['realname']} &nbsp;&nbsp; <a href="tel:{$actuser['mobile']}">{$actuser['mobile']}</a></p>
+            <p>活动时间：{php echo date("Y-m-d H:i",$activity['stime']);} ~ {php echo date("Y-m-d H:i",$activity['etime']);}</p>
+            <p>活动地点：{$activity['address']}</p>
+            <p>报名截止时间：{php echo date("Y-m-d H:i",$activity['endtime']);}</p>
+            <p>报名名额上限：{php echo $activity['unumber']==0?"无限制":$activity['unumber'];}</p>
+        </div>
+
+
+        {if $activity['status']==3}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">活动已结束</button>
+        {elseif !empty($myactenroll)}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">你已报名</button>
+        {elseif $activity['endtime'] < time()}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">报名已截止</button>
+        {elseif $activity['utype']==2}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">活动指定党员参与</button>
+        {elseif $activity['unumber']>0 && count($actenroll)>=$activity['unumber']}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">报名人数已达上限</button>
+        {else}
+        <a href="javascript:funEnroll();" class="am-btn am-btn-success am-btn-block">我要报名</a>
+        {/if}
+
+        {if $activity['userid']==$user['id']}
+        <a href="{php echo $this->createMobileUrl('activity',array('op'=>'manage','activityid'=>$id));}" class="am-btn am-btn-danger am-btn-block">我是活动组织者</a>
+        {/if}
+
+        {if !empty($actenroll)}
+        <hr class="am-article-divider">
+        <blockquote><p>已报名者 <strong class="am-fr">{php echo count($actenroll);} 人</strong></p></blockquote>
+        <ul class="am-avg-sm-6 am-thumbnails am-text-center">
+            {loop $actenroll $row}
+            <li>
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+        </ul>
+        {/if}
+
+        {if !empty($param['openmessage'])}
+        <hr class="am-article-divider">
+        <blockquote><p>
+            留言信息 (共 {$actmessagetol} 条)
+            <a class="am-fr" href="{php echo $this->createMobileUrl('actmessage',array('activityid'=>$id));}">
+                我要留言
+            </a>
+        </p></blockquote>
+        <ul class="am-comments-list am-comments-list-flip" id="list">
+            {loop $actmessage $row}
+            <li class="am-comment">
+                <article class="am-comment">
+                    <img src="{php echo tomedia($row['headpic']);}" class="am-comment-avatar" width="48" height="48"/>
+                    <div class="am-comment-main">
+                        <header class="am-comment-hd">
+                            <div class="am-comment-meta">
+                                <a href="#link-to-user" class="am-comment-author">{$row['realname']}</a>
+                                评论于 <time>{php echo date("Y-m-d H:i",$row['createtime'])}</time>
+                            </div>
+                        </header>
+                        <div class="am-comment-bd am-text-justify am-text-sm">
+                            {php echo str_replace("\n","<br />",$row['details']);}
+
+                            {if !empty($row['picall'])}
+                            <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-margin-top-xs am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+                                {loop $row['picall'] $index $pic}
+                                <li>
+                                    <img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}{$pic}" />
+                                </li>
+                                {/loop}
+                            </ul>
+                            {/if}
+                        </div>
+                    </div>
+                </article>
+            </li>
+            {/loop}
+        </ul>
+        <a href="{php echo $this->createMobileUrl('actmessage',array('activityid'=>$id));}" class="am-btn am-btn-default am-btn-block">查看更多留言</a>
+		<a href="{php echo $this->createMobileUrl('actmessage',array('activityid'=>$id));}" class="messagebtn">
+		    <i class="am-icon-edit"></i>
+		</a>
+		{/if}
+		<hr class="am-article-divider">
+		
+    </article>
+</div>
+
+
+<div class="am-modal am-modal-alert" tabindex="-1" id="myalert">
+    <div class="am-modal-dialog">
+    <div class="am-modal-hd">报名提示</div>
+        <div class="am-modal-bd" id="myalertmsg">
+            报名信息提示！！！
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn">确定</span>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function funEnroll() {
+    if(confirm("报名后不可撤销，并需要按要求参与活动，你确定要报名参与吗?")){
+        $.ajax({
+            type: 'POST',
+            url: "{php echo $this->createMobileUrl('activity',array('op'=>'enroll','activityid'=>$activity['id']));}",
+            dataType: 'JSON',
+            success: function(ret){
+                console.log(ret);
+                if (ret['status'] == 'error') {
+                    $("#myalertmsg").html(ret['msg']);
+                    $("#myalert").modal();
+                }else{
+                    $("#myalertmsg").html(ret['msg']+"<br>3s后刷新");
+                    $("#myalert").modal(); 
+                    setTimeout(function(){
+                        window.location.href = "{php echo $this->createMobileUrl('activity',array('id'=>$activity['id']));}";
+                    },3000);
+                }
+            },
+        }); 
+    }
+}
+</script>
+{template 'footer'}
+{elseif $op=="manage"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">组织活动</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$activity['title']}</h1>
+            <p class="am-article-meta">
+                {if empty($branch)} {$param['nicktil']} {else} {$branch['name']} {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $activity['createtime']);}</span>
+            </p>
+        </div>
+
+        <blockquote><p>
+            签到二维码
+            <a class="am-fr" href="javascript:$('#qrcode').slideToggle();">显示/隐藏</a>
+        </p></blockquote>
+        <div class="am-article-bd am-text-center" id="qrcode" style="display: none;">
+            <img style="display: block;margin: 0 auto;" src="http://qr.liantu.com/api.php?w=300&m=15&text={$url}"/>
+
+            <a class="am-btn am-btn-danger am-btn-block" href="{php echo $this->createMobileUrl('activity',array('op'=>'setsign','activityid'=>$activityid));}">
+            {php echo $activity['issign']==0?"目前签到关闭":"目前签到开启";}（点击更改状态）
+            </a>
+        </div>
+
+        {if $activity['utype']!=1}
+        <hr class="am-article-divider">
+        <blockquote><p>
+            指定党员
+            <span class="am-fr">共 {php echo count($utype2['sign'])+count($utype2['nosign'])} 人（已签到{php echo count($utype2['sign'])}人）</span>
+        </p></blockquote>
+        <ul class="am-avg-sm-6 am-thumbnails am-text-center">
+            {loop $utype2['nosign'] $row}
+            <li class="nosign">
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+            {loop $utype2['sign'] $row}
+            <li>
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+        </ul>
+        {/if}
+
+
+        {if $activity['utype']!=2}
+        <hr class="am-article-divider">
+        <blockquote><p>
+            自由报名
+            <span class="am-fr">共 {php echo count($utype1['sign'])+count($utype1['nosign'])} 人（已签到{php echo count($utype1['sign'])}人）</span>
+        </p></blockquote>
+
+        <ul class="am-avg-sm-6 am-thumbnails am-text-center">
+            {loop $utype1['nosign'] $row}
+            <li class="nosign">
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+            {loop $utype1['sign'] $row}
+            <li>
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+        </ul>
+        {/if}
+        
+
+        <hr class="am-article-divider">
+    </article>
+</div>
+
+
+
+{template 'footer'}
+{/if}

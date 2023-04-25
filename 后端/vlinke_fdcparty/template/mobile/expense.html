@@ -1,0 +1,109 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">交费详情</h1>
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('expcate');}">
+                    党费缴纳
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('explog');}">
+                    交费记录
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('expcount');}">
+                    党费计算器
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+<div class="am-container bg-fff am-padding-top-xs am-margin-bottom-sm exp-info">
+    <div class="am-form-group">
+        <span class="am-fr">{$user['realname']}</span>
+        <label>党员</label>
+    </div>
+    <div class="am-form-group">
+        <span class="am-fr">{$branch['name']}</span>
+        <label>
+        {$blevelarr[$branch['blevel']]}
+        </label>
+    </div>
+</div>
+
+
+<div class="am-container bg-fff am-margin-bottom exp-info">
+    <div class="am-form-group">
+        <strong>{$expcate['name']}</strong>
+    </div>
+    <div class="am-form-group">
+        <span class="am-fr">{php echo date("Y-m-d H:i", $expcate['endtime']);}</span>
+        <label>交费截止时间</label>
+    </div>
+    <div class="am-form-group">
+        <label>交费说明</label>
+    </div>
+    <div class="am-form-group am-text-justify">
+        {php echo html_entity_decode($expcate['details'], ENT_QUOTES)}
+    </div>
+</div>
+
+
+<div class="am-container bg-fff am-padding-top-sm am-padding-bottom-xl">
+<form method="post" name="myform" action="{php echo $this->createMobileUrl('expense',array('op'=>'post','id'=>$expense['id']));}" class="am-form" onsubmit="return checkForm();">
+
+    <div class="am-form-group">
+        <label>金额（元）</label>
+        <input type="text" class="am-form-field" name="paymoney" id="paymoney" value="{$expense['paymoney']}" placeholder="输入缴纳金额..." {if $expcate['status']!=1 || $expense['status']==2} readonly="readonly" {/if} required>
+    </div>
+
+    <div class="am-form-group">
+        <label>备注</label>
+        <textarea class="am-form-field" name="remark" placeholder="输入备注信息..." {if $expense['status']==2} readonly="readonly" {/if} rows="5">{$expense['remark']}</textarea>
+    </div>
+    
+    {if $expense['status']==1}
+    <div class="am-form-group am-padding-top">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="立即提交支付">
+    </div>
+    {else}
+    <div class="am-form-group am-padding-top">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="已支付" disabled="disabled">
+    </div>
+    {/if}
+</form>
+</div>
+
+<script type="text/javascript">
+function checkForm() {
+    var paymoney = parseFloat($("#paymoney").val());
+    if (paymoney<=0) {
+        alert("支付金额必须大于0！");
+        return false;
+    }
+    return true;
+}
+</script>
+
+{template 'footer'}
+{/if}

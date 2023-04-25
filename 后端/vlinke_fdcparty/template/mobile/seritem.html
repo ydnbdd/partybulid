@@ -1,0 +1,175 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">{$sercate['name']}</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('sercate',array('cateid'=>0));}">
+                    全部志愿服务
+                </a>
+            </li>
+            {loop $sercatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('sercate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$seritem['title']}</h1>
+            <p class="am-article-meta">
+                {if empty($branch)} {$param['nicktil']} {else} {$branch['name']} {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $seritem['createtime']);}</span>
+            </p>
+        </div>
+
+        <blockquote><p>联系<strong class="am-fr">{$seritem['realname']} &nbsp;&nbsp; <a href="tel:{$seritem['mobile']}">{$seritem['mobile']}</a></strong>
+        </p></blockquote>
+
+        <blockquote><p>时间<strong class="am-fr">{php echo date("m-d H:i", $seritem['starttime']);} ~ {php echo date("m-d H:i", $seritem['endtime']);}</strong></p></blockquote>
+
+        <blockquote><p>地点<strong class="am-fr am-text-right" style="width:80%;">{$seritem['address']}</strong></p></blockquote>
+
+        <blockquote><p>人数<strong class="am-fr">{$seritem['unumber']} 人</strong></p></blockquote>
+
+        
+
+        <blockquote><p>详情</p></blockquote>
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($seritem['details'], ENT_QUOTES)}
+        </div>
+
+        {if $seritem['getval']>0}
+        <blockquote><p>认领此心愿，将获得 {$seritem['getval']} 积分奖励！</p></blockquote>
+        {/if}
+
+        <hr class="am-article-divider">
+        {if $seritem['status']==3}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">认领已完成</button>
+        {elseif !empty($myserlog)}
+        <button type="button" class="am-btn am-btn-success am-btn-block" disabled="disabled">你已认领</button>
+        {else}
+        <a href="javascript:funClaim();" class="am-btn am-btn-success am-btn-block">我要认领</a>
+        {/if}
+
+        {if !empty($serlog)}
+        <blockquote><p>已认领者 <strong class="am-fr">{php echo count($serlog);} 人</strong></p></blockquote>
+        <ul class="am-avg-sm-6 am-thumbnails am-text-center">
+            {loop $serlog $row}
+            <li>
+                <img class="am-thumbnail am-circle am-margin-bottom-xs" src="{php echo tomedia($row['headpic']);}" />
+                <p class="am-text-truncate am-margin-vertical-0 am-text-xs">{$row['realname']}</p>
+            </li>
+            {/loop}
+        </ul>
+        {/if}
+        <hr class="am-article-divider">
+		
+		{if !empty($param['openmessage'])}
+        <blockquote><p>
+            留言信息 (共 {$sermessagetol} 条)
+            <a class="am-fr" href="{php echo $this->createMobileUrl('sermessage',array('itemid'=>$id));}">
+                我要留言
+            </a>
+        </p></blockquote>
+        <ul class="am-comments-list am-comments-list-flip" id="list">
+            {loop $sermessage $row}
+            <li class="am-comment">
+                <article class="am-comment">
+                    <img src="{php echo tomedia($row['headpic']);}" class="am-comment-avatar" width="48" height="48"/>
+                    <div class="am-comment-main">
+                        <header class="am-comment-hd">
+                            <div class="am-comment-meta">
+                                <a href="#link-to-user" class="am-comment-author">{$row['realname']}</a>
+                                评论于 <time>{php echo date("Y-m-d H:i",$row['createtime'])}</time>
+                            </div>
+                        </header>
+                        <div class="am-comment-bd am-text-justify am-text-sm">
+                            {php echo str_replace("\n","<br />",$row['details']);}
+                            {if !empty($row['picall'])}
+                            <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-margin-top-xs am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+                                {loop $row['picall'] $index $pic}
+                                <li>
+                                    <img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}{$pic}" />
+                                </li>
+                                {/loop}
+                            </ul>
+                            {/if}
+                        </div>
+                    </div>
+                </article>
+            </li>
+            {/loop}
+        </ul>
+        <a href="{php echo $this->createMobileUrl('sermessage',array('itemid'=>$id));}" class="am-btn am-btn-default am-btn-block">查看更多留言</a>
+		<a href="{php echo $this->createMobileUrl('sermessage',array('itemid'=>$id));}" class="messagebtn">
+		    <i class="am-icon-edit"></i>
+		</a>
+		<hr class="am-article-divider">
+		{/if}
+		
+
+    </article>
+</div>
+
+<div class="am-modal am-modal-alert" tabindex="-1" id="myalert">
+    <div class="am-modal-dialog">
+    <div class="am-modal-hd">认领提示</div>
+        <div class="am-modal-bd" id="myalertmsg">
+            认领信息提示！！！
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn">确定</span>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+function funClaim() {
+    if(confirm("认领后不可撤销，并需要按要求完成任务，你确定要认领吗?")){
+        $.ajax({
+            type: 'POST',
+            url: "{php echo $this->createMobileUrl('seritem',array('op'=>'claim','itemid'=>$seritem['id']));}",
+            dataType: 'JSON',
+            success: function(ret){
+                console.log(ret);
+                if (ret['status'] == 'error') {
+                    $("#myalertmsg").html(ret['msg']);
+                    $("#myalert").modal();
+                }else{
+                    $("#myalertmsg").html(ret['msg']+"<br>3s后刷新");
+                    $("#myalert").modal(); 
+                    setTimeout(function(){
+                        window.location.href = "{php echo $this->createMobileUrl('seritem',array('id'=>$seritem['id']));}";
+                    },3000);
+                }
+            },
+        }); 
+    }
+}
+</script>
+
+
+
+{template 'footer'}
+{/if}

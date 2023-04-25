@@ -1,0 +1,241 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">党员学习</h1>
+
+<div class="am-header-right am-header-nav" style="margin-right: 40px;">
+    <a href="javascript:$('.edusearch-box').slideToggle();">
+        <i class="am-header-icon am-icon-search"></i>
+    </a>
+</div>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0);" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>0));}">
+                    全部课程
+                </a>
+            </li>
+            {loop $educatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<!-- 搜索 -->
+<div class="am-container am-topbar-fixed-top am-padding-top-sm edusearch-box">
+<form method="get" action="" class="am-form am-form-inline">
+<input type="hidden" name="c" value="entry" />
+<input type="hidden" name="i" value="{$_W['uniacid']}" />
+<input type="hidden" name="m" value="vlinke_fdcparty" />
+<input type="hidden" name="do" value="educate" />
+    <div class="am-input-group">
+        <input type="text" name="keywords" class="am-form-field" value="{$keywords}" placeholder="请输入搜索的课程标题...">
+        <span class="am-input-group-btn">
+            <input type="hidden" name="token" value="{$_W['token']}" />
+            <button class="am-btn am-btn-default" type="submit"><span class="am-icon-search"></span></button>
+        </span>
+    </div>
+</form>
+
+<ul class="am-avg-sm-3 am-thumbnails am-padding-top-sm">
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'nostudy'));}" class="am-btn am-btn-primary am-btn-block">未学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'dostudy'));}" class="am-btn am-btn-primary am-btn-block">正在学习</a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('dostudy'=>'okstudy'));}" class="am-btn am-btn-primary am-btn-block">已完成</a>
+    </li>
+</ul>
+</div>
+
+
+<div class="am-container box-slider">
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $slide $row}
+        <li>
+            <a href="{$row['link']}">
+                <img src="{php echo tomedia($row['tilpic']);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+</div>
+
+
+<div class="am-container am-margin-bottom-sm bg-fff">
+<ul class="am-avg-sm-5 default-nav art-nav am-margin-bottom-0">
+    {loop $educatenav $row}
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>$row['id']));}">
+            <img src="{php echo tomedia($row['cicon']);}">
+            <p class="am-text-truncate">{$row['name']}</p>
+        </a>
+    </li>
+    {/loop}   
+</ul>
+</div>
+
+
+
+<div class="am-container am-margin-bottom-sm bg-fff am-margin-bottom-0">
+<ul class="am-avg-sm-2  am-thumbnails edustustatus-nav am-margin-bottom-0">
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>0,'stustatus'=>1));}">
+            <p class="am-text-truncate am-margin-bottom-0">
+                <strong>必修课</strong>
+                <span class="am-fr">共 {$edulessontol[1]['tol']} 门课程 &raquo;</span>
+            </p>
+        </a>
+    </li> 
+    <li>
+        <a href="{php echo $this->createMobileUrl('educate',array('cateid'=>0,'stustatus'=>2));}">
+            <p class="am-text-truncate am-margin-bottom-0">
+                <strong>选修课</strong>
+                <span class="am-fr">共 {$edulessontol[2]['tol']} 门课程 &raquo;</span>
+            </p>
+        </a>
+    </li>  
+</ul>
+</div>
+
+{if !empty($edustudy)}
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list edulogbox" >
+<div class="am-list-news-bd" id="actenrollbox">
+<ul class="am-list">
+{loop $edustudy $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-2 am-list-thumb">
+        <img class="am-circle" src="{php echo tomedia($row['headpic']);}"/>
+    </div>
+    <div class="am-u-sm-10 am-list-main">
+        <h3 class="am-list-item-hd am-text-justify am-text-sm">
+            <a href="{php echo $this->createMobileUrl('edulesson',array('id'=>$row['lessonid']));}">
+                <span class="am-text-danger">{$row['realname']}</span> 
+                <span class="am-link-muted">学完了</span> 
+                {$row['title']}
+            </a>
+        </h3>
+    </div>
+</li>
+{/loop}
+</ul>
+</div>
+</div>
+{if 1 < count($edustudy)}
+<script type="text/javascript">
+function AutoScroll(obj) {
+    $(obj).find("ul:first").animate({
+        marginTop: "-72px"
+    },
+    500,
+    function() {
+        $(this).css({
+            marginTop: "0px"
+        }).find("li:first").appendTo(this);
+    });
+}
+$(document).ready(function() {
+    setInterval('AutoScroll("#actenrollbox")', 5000)
+});
+</script>
+{/if}
+{/if}
+
+
+<!-- 学习课程 -->
+<div data-am-widget="titlebar" class="am-titlebar bg-fff am-titlebar-multi am-margin-top-0">
+    <h2 class="am-titlebar-title">所有课程</h2>
+    <nav class="am-titlebar-nav">
+        <a href="{php echo $this->createMobileUrl('educate');}">更多 &raquo;</a>
+    </nav>
+</div>
+
+<div class="am-container bg-fff am-padding-top">
+<ul class="am-avg-sm-2 am-thumbnails" id="list">
+</ul>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('eduhome',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="edulesson-box">
+    <a href="{php echo $this->createMobileUrl('edulesson',array('id'=>$row['id']));}">
+        <img class="am-img-thumbnail" src="{php echo tomedia($row['tilpic']);}"/>
+    </a>
+    <h3 class="am-margin-vertical-xs am-text-justify">
+        <a href="{php echo $this->createMobileUrl('edulesson',array('id'=>$row['id']));}">
+            {$row['title']}
+        </a>
+    </h3>
+    <p class="am-margin-vertical-xs am-text-xs am-link-muted">
+        {if $row['stustatus']==1}
+        <span class="am-fr am-badge am-badge-danger">必修</span>
+        {else}
+        <span class="am-fr am-badge am-badge-primary">选修</span>
+        {/if}
+
+        <span>
+        {if empty($edustudy[$row['id']])}
+        未学习
+        {elseif $edustudy[$row['id']]['status']==1}
+        正在学习
+        {else}
+        已完成
+        {/if}
+        </span>
+    </p>
+</li>
+{/loop}
+{/if}

@@ -1,0 +1,504 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">我的成绩</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('exahome')}">
+                    在线考试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaday')}">
+                    每日测试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exapaper')}">
+                    考试项目
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaanswer')}">
+                    我的成绩
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+</ul>
+</div>
+</div>
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('exaanswer',array('op'=>'getmore'));}",
+        data: {page:page},
+        success: function(ret){
+            console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+    <div class="am-u-sm-12 am-list-main">
+        <a href="{php echo $this->createMobileUrl('exaanswer',array('op'=>'answer','exapaperid'=>$row['paperid']));}">
+        <h3 class="am-list-item-hd am-text-justify">
+            {$row['title']}
+        </h3>
+        <div class="am-list-item-text">
+            耗时：{php echo floor(($row['finishtime']-$row['stime'])/60)."分".(($row['finishtime']-$row['stime'])%60)."秒";}<br>
+            考试时间：{php echo date("Y-m-d H:i",$row['stime']);}
+            <span class="am-badge am-badge-success am-fr">{$row['getval']} 分</span>
+        </div>
+        </a>
+    </div>
+</li>
+{/loop}
+{elseif $op=="answer"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">考试答卷</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('exahome')}">
+                    在线考试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaday')}">
+                    每日测试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exapaper')}">
+                    考试项目
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaanswer')}">
+                    我的成绩
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+{if $exaanswer['status']==1}
+<script type="text/javascript">
+var timelimit = {$timelimit};
+function PrefixInteger(num, length) {
+    return (Array(length).join('0') + num).slice(-length);
+}
+$(function(){
+    var timer = null;
+    timer = setInterval(function(){
+        timelimit--;
+        var minute = parseInt(timelimit/60);
+        var second = PrefixInteger(parseInt(timelimit%60),2);
+        $("#minute").html(minute);
+        $("#second").html(second);
+        if (timelimit<=0) {
+            clearInterval(timer);
+            subAnswer();
+        }
+    },1000);
+});
+</script>
+{/if}
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$exapaper['title']}</h1>
+        </div>
+        <hr class="am-article-divider am-margin-0">
+        <!-- 倒计时 -->
+        {if $exaanswer['status']==1}
+        <p class=" am-margin-vertical-sm am-text-center">距离考试结束还有：
+            <strong id="minute" class="am-text-xl am-text-danger"></strong> 分
+            <strong id="second" class="am-text-xl am-text-danger"></strong> 秒
+        </p>
+        <hr class="am-article-divider am-margin-0">
+        {/if}
+        
+        <!-- 未开始答卷 -->
+        {if $exaanswer['status']==0}
+        <div class="exaanswerbox am-padding-top am-padding-bottom-lg">
+        <p>
+            考试开始时间：{php echo date("Y-m-d H:i",$exapaper['starttime']);}<br />
+            考试截止时间：{php echo date("Y-m-d H:i",$exapaper['endtime']);}
+        </p>
+        <p>
+            单选题型：单选题 <strong class="am-text-danger">{$exapaper['singlenum']}</strong> 道，每道 <strong class="am-text-danger">{$exapaper['singleval']}</strong> 分<br />
+            多选题型：多选题 <strong class="am-text-danger">{$exapaper['multinum']}</strong> 道，每道 <strong class="am-text-danger">{$exapaper['multival']}</strong> 分<br />
+            试卷总分：<strong class="am-text-danger">{$exaanswer['setval']} 分</strong><br />
+            最高积分：<strong class="am-text-danger">{$exapaper['integral']} 积分</strong>
+        </p>
+        <hr class="am-article-divider am-margin-0">
+        <div class="am-g am-g-collapse am-padding-top-lg">
+            <div class="am-u-sm-12">
+                <a href="{php echo $this->createMobileUrl('exaanswer',array('op'=>'startanswer','exapaperid'=>$exapaperid))}" class="am-btn am-btn-danger am-btn-block">开始答题</a>
+            </div>
+        </div>
+        {/if}
+
+        <!-- 答卷已完成 -->
+        {if $exaanswer['status']==2}
+        <div class="exaanswerbox am-padding-top am-padding-bottom-lg">
+        <p>
+            考试开始时间：{php echo date("Y-m-d H:i",$exapaper['starttime']);}<br />
+            考试截止时间：{php echo date("Y-m-d H:i",$exapaper['endtime']);}
+        </p>
+        <p>
+            单选题型：单选题 <strong class="am-text-danger">{$exapaper['singlenum']}</strong> 道，每道 <strong class="am-text-danger">{$exapaper['singleval']}</strong> 分<br />
+            多选题型：多选题 <strong class="am-text-danger">{$exapaper['multinum']}</strong> 道，每道 <strong class="am-text-danger">{$exapaper['multival']}</strong> 分<br />
+            试卷总分：<strong class="am-text-danger">{$exaanswer['setval']} 分</strong><br />
+            最高积分：<strong class="am-text-danger">{$exapaper['integral']} 积分</strong>
+        </p>
+        <p>
+            交卷时间：{php echo date("Y-m-d H:i",$exaanswer['finishtime']);}<br />
+            作答用时：{$exaanswer['usertime']}<br />
+            评卷情况：试卷得分 <strong class="am-text-success">{$exaanswer['getval']} 分</strong>，获得 <strong class="am-text-success">{$exaanswer['integral']} 积分</strong>
+        </p>
+        <hr class="am-article-divider am-margin-0">
+        <p>
+        {loop $exaitemall $index $row}
+        {if $row['isright']=='0'}
+        <a href="javascript:switchBox({$index});" class="am-btn am-btn-default am-margin-bottom-xs switchitem">
+            {php echo $index+1;}
+            {if $row['qtype']==1}
+            <i>单</i>
+            {elseif $row['qtype']==2}
+            <i>多</i>
+            {/if}
+        </a>
+        {elseif $row['isright']==1}
+        <a href="javascript:switchBox({$index});" class="am-btn am-btn-danger am-margin-bottom-xs switchitem">
+            {php echo $index+1;}
+            {if $row['qtype']==1}
+            <i>单</i>
+            {elseif $row['qtype']==2}
+            <i>多</i>
+            {/if}
+        </a>
+        {elseif $row['isright']==2}
+        <a href="javascript:switchBox({$index});" class="am-btn am-btn-success am-margin-bottom-xs switchitem">
+            {php echo $index+1;}
+            {if $row['qtype']==1}
+            <i>单</i>
+            {elseif $row['qtype']==2}
+            <i>多</i>
+            {/if}
+        </a>
+        {/if}
+        {/loop}
+        </p>
+        <div class="am-g am-g-collapse am-padding-top-lg am-padding-bottom-lg">
+            <div class="am-u-sm-12">
+                <a href="javascript:switchBox(0);" class="am-btn am-btn-default am-btn-block">查看详情</a>
+            </div>
+        </div>
+        </div>
+        <script type="text/javascript">
+        function switchBox(index) {
+            $(".exaanswerbox").hide();
+            $(".exaitemlist").show();
+            if (index!=='undefined') {
+                switchItem(index);
+            }
+        }
+        function showTol() {
+            $(".exaanswerbox").show();
+            $(".exaitemlist").hide();
+        }
+        </script>
+        {/if}
+
+        <!-- 试题详情 -->
+        <div class="exaitemlist am-padding-bottom-xl" style="{if $exaanswer['status']!=1}display:none;{/if}">
+        {loop $exaitemall $index $row}
+        <div class="exaitembox" id="exaitembox{$index}">
+        <p class="am-margin-top-sm am-text-justify">
+            {php echo $index+1;}、
+            {if $row['qtype']==1}
+            <span class="am-badge am-radius">单选</span>
+            <span class="am-badge am-radius">{$exapaper['singleval']}分</span>
+            {elseif $row['qtype']==2}
+            <span class="am-badge am-radius">多选</span>
+            <span class="am-badge am-radius">{$exapaper['multival']}分</span>
+            {/if}
+            
+            {$row['title']}
+        </p>
+
+        {if !empty($row['tilpic'])}
+        <img class="am-img-responsive am-padding-bottom-sm" src="{php echo tomedia($row['tilpic']);}">
+        {/if}
+
+        {if $row['qtype']==1}
+        {if !empty($row['itema'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">A、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="A" data-am-ucheck {if strpos($row['myanswer'],"A") !== false}checked{/if}> {$row['itema']}
+        </label>
+        {/if}
+        {if !empty($row['itemb'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">B、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="B" data-am-ucheck {if strpos($row['myanswer'],"B") !== false}checked{/if}> {$row['itemb']}
+        </label>
+        {/if}
+        {if !empty($row['itemc'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">C、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="C" data-am-ucheck {if strpos($row['myanswer'],"C") !== false}checked{/if}> {$row['itemc']}
+        </label>
+        {/if}
+        {if !empty($row['itemd'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">D、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="D" data-am-ucheck {if strpos($row['myanswer'],"D") !== false}checked{/if}> {$row['itemd']}
+        </label>
+        {/if}
+        {if !empty($row['iteme'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">E、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="E" data-am-ucheck {if strpos($row['myanswer'],"E") !== false}checked{/if}> {$row['iteme']}
+        </label>
+        {/if}
+        {if !empty($row['itemf'])}
+        <label class="am-radio am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">F、</span>
+            <input type="radio" name="myanswer{$row['id']}" value="F" data-am-ucheck {if strpos($row['myanswer'],"F") !== false}checked{/if}> {$row['itemf']}
+        </label>
+        {/if}
+        
+        {elseif $row['qtype']==2}
+        {if !empty($row['itema'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">A、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="A" data-am-ucheck {if strpos($row['myanswer'],"A") !== false}checked{/if}> {$row['itema']}
+        </label>
+        {/if}
+        {if !empty($row['itemb'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">B、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="B" data-am-ucheck {if strpos($row['myanswer'],"B") !== false}checked{/if}> {$row['itemb']}
+        </label>
+        {/if}
+        {if !empty($row['itemc'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">C、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="C" data-am-ucheck {if strpos($row['myanswer'],"C") !== false}checked{/if}> {$row['itemc']}
+        </label>
+        {/if}
+        {if !empty($row['itemd'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">D、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="D" data-am-ucheck {if strpos($row['myanswer'],"D") !== false}checked{/if}> {$row['itemd']}
+        </label>
+        {/if}
+        {if !empty($row['iteme'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">E、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="E" data-am-ucheck {if strpos($row['myanswer'],"E") !== false}checked{/if}> {$row['iteme']}
+        </label>
+        {/if}
+        {if !empty($row['itemf'])}
+        <label class="am-checkbox am-secondary itembox {if $exaanswer['status']==2}{php echo $row['isright']==1?'am-danger':'am-success';}{/if}">
+            <span class="biaozi">F、</span>
+            <input type="checkbox" name="myanswer{$row['id']}" value="F" data-am-ucheck {if strpos($row['myanswer'],"F") !== false}checked{/if}> {$row['itemf']}
+        </label>
+        {/if}
+        {/if}
+        <hr class="am-article-divider am-margin-0">
+		{if !empty($row['aexplain']) && $exapaper['isexplain']==2}
+		<button type="button" class="am-btn am-btn-default am-btn-sm am-round am-center am-margin-vertical-sm" data-am-modal="{target: '#aexplainbox{$row[bankid]}'}">答案解析 &gt; </button>
+		<div class="am-modal-actions" id="aexplainbox{$row[bankid]}">
+			<div class="am-modal-actions-group am-padding am-text-justify bg-fff">
+				<h3 class="am-text-center am-margin-0">
+					<a class="am-close am-icon-times am-fr" onclick="javascript:$('#aexplainbox{$row[bankid]}').modal('close');"></a>
+					<strong>答案解析</strong>
+				</h3>
+				<hr class="am-article-divider am-margin-vertical-sm am-margin-horizontal-0">
+				<div class="aexplaintext">{php echo html_entity_decode($row['aexplain'], ENT_QUOTES)}</div>
+			</div>
+			<div class="am-modal-actions-group">
+				<button class="am-btn am-btn-secondary am-btn-block" data-am-modal-close>我知道了</button>
+			</div>
+		</div>
+		{/if}
+        {if $exaanswer['status']==2}
+        <p class="am-text-primary am-padding-top-sm am-text-sm am-margin-0">
+            正确答案：{$row['answer']}，您的答案：{php echo empty($row['myanswer'])?"未作答":$row['myanswer'];}
+        </p>
+        {/if}
+        <p class="am-text-primary am-padding-top-sm am-text-sm am-margin-0">
+            统计：此题共 {php echo $row['aright']+$row['awrong'];} 人次作答{if ($row['aright']+$row['awrong'])!=0}，答对率 {php echo round(($row['aright']*100)/($row['aright']+$row['awrong']));}%{/if}
+        </p>
+        <div class="am-g am-g-collapse am-padding-top-lg am-padding-bottom">
+            <div class="am-u-sm-5">
+                {if $index==0}
+                <a href="javascript:;" class="am-btn am-btn-danger am-btn-block" disabled="disabled">已是首道题</a>
+                {else}
+                <a href="javascript:switchItem({php echo $index-1;},{$row['id']});" class="am-btn am-btn-danger am-btn-block">上一题</a>
+                {/if}
+            </div>
+            <div class="am-u-sm-2"></div>
+            <div class="am-u-sm-5">
+                {if $index==count($exaitemall)-1}
+                <a href="javascript:;" class="am-btn am-btn-danger am-btn-block" disabled="disabled">已是尾道题</a>
+                {else}
+                <a href="javascript:switchItem({php echo $index+1;},{$row['id']});" class="am-btn am-btn-danger am-btn-block">下一题</a>
+                {/if}
+            </div>
+        </div>
+        {if $exaanswer['status']==1}
+        <div class="am-g am-g-collapse am-padding-bottom-lg">
+            <div class="am-u-sm-12">
+                <a href="javascript:switchItem({$index},{$row['id']},1);" class="am-btn am-btn-success am-btn-block">提交</a>
+            </div>
+        </div>
+        {elseif $exaanswer['status']==2}
+        <div class="am-g am-g-collapse am-padding-bottom-lg">
+            <div class="am-u-sm-12">
+                <a href="javascript:showTol();" class="am-btn am-btn-success am-btn-block">考试结果</a>
+            </div>
+        </div>
+        {/if}
+        </div>
+        {/loop}
+        </div>
+        
+    </article>
+</div>
+
+<script type="text/javascript">
+var exaanswerstatus = {$exaanswer['status']};
+
+function switchItem(index,exaitemid,submit) {
+	exaitemid = typeof exaitemid !== 'undefined' ?  exaitemid : 0;
+	submit = typeof submit !== 'undefined' ?  submit : 0;
+    $(".exaitembox").hide();
+    $("#exaitembox"+index).show();
+
+    var myanswer = "";
+    $("input[name=myanswer"+exaitemid+"]:checked").each(function(i){ myanswer += $(this).val(); });
+    if (submit==1 && myanswer=="") {
+        alert("请选择该题答案！");
+        return;
+    }
+		
+    if (exaanswerstatus==1 && exaitemid!=0 && myanswer!="") {
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: {exaitemid:exaitemid,myanswer:myanswer},
+            url: "{php echo $this->createMobileUrl('exaanswer',array('op'=>'setitem'));}",
+            cache: false,
+            async: false,
+            beforeSend:function(){},
+            success: function(res){
+                if (res['status']=='error' && res['msg']!='error') {
+                    alert(res['msg']);
+                    return;
+                }
+                if (submit==1) {
+                    subAnswer();
+                }
+            },
+            error:function(){},
+            complete:function(){}
+        });
+    }
+}
+
+function subAnswer() {
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: {},
+        url: "{php echo $this->createMobileUrl('exaanswer',array('op'=>'submit','exapaperid'=>$exapaperid));}",
+        cache: false,
+        beforeSend:function(){},
+        success: function(res){
+            console.log(res);
+            if (res['status']=='error') {
+                alert(res['msg']);
+                if (res['index']!=-1) {
+                    switchItem(res['index']);
+                    return;
+                }
+            }else{
+                location.href = "{php echo $this->createMobileUrl('exaanswer',array('op'=>'answer','exapaperid'=>$exapaperid));}";
+            }
+        },
+        error:function(){},
+        complete:function(){}
+    });
+}
+
+$(function(){
+    $(".exaitembox").hide();
+    switchItem(0);
+});
+</script>
+
+
+{template 'footer'}
+{/if}

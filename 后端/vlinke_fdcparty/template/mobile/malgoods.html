@@ -1,0 +1,94 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">商品详情</h1>
+</header>
+
+
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $malgoods['bander'] $row}
+        <li>
+            <a href="{$row}">
+                <img src="{php echo tomedia($row);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+
+<div class="am-container am-margin-bottom-sm bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-lg am-text-justify">{$malgoods['title']}</h1>
+        </div>
+    </article>
+</div>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd am-padding-top">
+			<p class="am-article-meta am-text-danger am-text-lg">
+			    需要积分：{$malgoods['integral']} 积分
+			</p>
+            <p class="am-article-meta">
+                库存：{$malgoods['stock']}件
+				<span class="am-fr">已兑：{$malgoods['sales']}件</span>
+            </p>
+        </div>
+		<hr class="am-article-divider am-margin-vertical-sm">
+        <div class="am-article-bd am-text-justify">
+			<img style="width: 100%;" src="{$votitem['tilpic']}" />
+            {php echo html_entity_decode($malgoods['details'], ENT_QUOTES)}
+        </div>
+
+    </article>
+</div>
+
+
+<div class="am-padding-vertical-lg"></div>
+<div class="am-g am-g-fixed bg-fff malgoods-foot am-padding-vertical-sm">
+    <div class="am-u-sm-12">
+		{if $malgoods['status']==2 && $malgoods['stock']>0}
+		<button class="am-btn am-btn-danger am-btn-block" onclick="javascript:setGoods();" >立即兑换</button>
+		{else}
+		<button class="am-btn am-btn-block" disabled="disabled">已兑完</button>
+		{/if}
+    </div>
+</div>
+
+<script type="text/javascript">
+	var setnow = true;
+	function setGoods() {
+		if (setnow==false){
+			return false;
+		}
+		setnow = false;
+		if(confirm("兑换该商品会扣除{$malgoods['integral']}积分，确定要兑换吗？")){
+			$.ajax({
+				type: 'POST',
+				url: "{php echo $this->createMobileUrl('malgoods',array('op'=>'setgoods','goodsid'=>$malgoods['id']));}",
+				data: {},
+				dataType: 'json',
+				async: false,
+				cache: false,
+				success: function(res){
+					if ( res['ret']=='error' ) {
+					    alert(res['msg']);
+					}else if ( res['ret']=='success' ) {
+					    alert(res['msg']);
+						location.href = "{$_W['siteroot']}app/index.php?i={$_W['uniacid']}&c=entry&do=mallog&m=vlinke_fdcparty";
+					}
+				}
+			}); 
+		}
+	}
+</script>
+
+{template 'footer'}
+{/if}

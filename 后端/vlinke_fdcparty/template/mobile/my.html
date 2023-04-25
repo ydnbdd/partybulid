@@ -1,0 +1,91 @@
+{if $op=="display"}
+{template 'header'}
+<div class="am-container bg-fff myhead" style="background-image: url('{php echo tomedia($param[mypic]);}');">
+    <a class="myinfo" href="{php echo $this->createMobileUrl('myinfo');}">
+        <span class="am-icon-cog am-text-xl am-animation-spin"></span>
+    </a>
+    <div class="myhead-info">
+        {if empty($user['headpic'])}
+        <img class="am-img-thumbnail headpic" src="{MODULE_URL}template/static/dfhead.jpg">
+        {else}
+        <img class="am-img-thumbnail headpic" src="{php echo tomedia($user['headpic']);}">
+        {/if}
+        <p>
+            {php echo empty($user['realname'])?$user['nickname']:$user['realname'];} &nbsp;
+            {if $user['sex']==1}
+            <span class="am-icon-mars am-text-primary"></span>
+            {else}
+            <span class="am-icon-venus am-text-danger"></span>
+            {/if}
+        </p>
+        <p class="ulevel">{$ulevelarr[$user['ulevel']]}</p>
+        <div class="intinfo">
+            {$user['integral']}
+            <span>积分</span>
+        </div>
+    </div>
+</div>
+<div class="am-container" style="height: 30px;"></div>
+
+
+{if !empty($notice)}
+<div class="mynotice">
+    <img class="am-circle" src="{MODULE_URL}template/static/my-notice.png">
+    <a href="{php echo $this->createMobileUrl('notice',array('op'=>'details','id'=>$notice['id']));}">
+        <h3>
+            最新通知公告
+            <span>{php echo date("Y-m-d",$notice['createtime']);}</span>
+        </h3>
+        <p>{$notice['title']}</p>
+    </a>
+</div>
+{/if}
+
+{if !empty($param['mynav'])}
+<ul class="am-avg-sm-3 mynavbox">
+    {loop $param['mynav'] $index $row}
+    <li style="{if $index%3==2}border-right: 0px;{/if}">
+        <a href="{$row['url']}">
+        <img src="{php echo tomedia($row['pic']);}">
+        <p>{$row['til']}</p>
+        </a>
+    </li>
+    {/loop}
+</ul>
+{/if}
+
+{if !empty($brancharr)}
+<ul class="am-list am-list-border my-nav">
+    {loop $brancharr $row}
+    <li class="my-branch">
+        <a href="{php echo $this->createMobileUrl('mybranch',array('op'=>'details','branchid'=>$row['id']));}">
+            <span class="am-icon-angle-right"></span>
+            {$row['name']}
+        </a>
+    </li>
+    {/loop}
+</ul>
+{/if}
+
+
+<ul class="am-list am-list-border my-nav am-margin-top-0">
+    <li class="user-nav my-aboutus">
+        <a href="{php echo $this->createMobileUrl('aboutus');}">
+            <span class="am-icon-angle-right"></span>
+            关于我们
+        </a>
+    </li>
+    {if !empty($telarr)}
+    {loop $telarr $row}
+    <li class="user-nav my-telephone">
+        <a href="tel:{$row['phone']}">
+            <span class="">{$row['phone']}</span>
+            {$row['name']}
+        </a>
+    </li>
+    {/loop}
+    {/if}
+</ul>
+
+{template 'footer'}
+{/if}

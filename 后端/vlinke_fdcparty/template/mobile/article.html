@@ -1,0 +1,110 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">{$artcate['name']}</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('artcate',array('cateid'=>0));}">
+                    所有动态
+                </a>
+            </li>
+            {loop $artcatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('artcate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$article['title']}</h1>
+            <p class="am-article-meta">
+                {if empty($branch)} {$param['nicktil']} {else} {$branch['name']} {/if}
+                <span class="am-fr">{php echo date("Y-m-d H:i", $article['createtime']);}</span>
+            </p>
+        </div>
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($article['details'], ENT_QUOTES)}
+        </div>
+
+        <hr class="am-article-divider">
+        
+        {if !empty($integralid)}
+        <blockquote><p>阅读完此文，你已获得 {$article['integral']} 积分奖励！</p></blockquote>
+        <hr class="am-article-divider">
+        {/if}
+
+		{if !empty($param['openmessage'])}
+        <blockquote><p>
+            评论信息 (共 {$artmessagetol} 条)
+            <a class="am-fr" href="{php echo $this->createMobileUrl('artmessage',array('articleid'=>$id));}">
+                我要评论
+            </a>
+        </p></blockquote>
+        <ul class="am-comments-list am-comments-list-flip" id="list">
+            {loop $artmessage $row}
+            <li class="am-comment">
+                <article class="am-comment">
+                    
+                    <img src="{php echo tomedia($row['headpic']);}" class="am-comment-avatar" width="48" height="48"/>
+
+                    <div class="am-comment-main">
+                        <header class="am-comment-hd">
+                            <div class="am-comment-meta">
+                                <a href="#link-to-user" class="am-comment-author">{$row['realname']}</a>
+                                评论于 <time>{php echo date("Y-m-d H:i",$row['createtime'])}</time>
+                            </div>
+                        </header>
+                        <div class="am-comment-bd am-text-justify am-text-sm">
+                            {php echo str_replace("\n","<br />",$row['details']);}
+
+                            {if !empty($row['picall'])}
+                            <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-margin-top-xs am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+                                {loop $row['picall'] $index $pic}
+                                <li>
+                                    <img class="am-thumbnail am-margin-bottom-xs" src="{$_W[attachurl]}{$pic}" />
+                                </li>
+                                {/loop}
+                            </ul>
+                            {/if}
+                        </div>
+                    </div>
+                </article>
+            </li>
+            {/loop}
+        </ul>
+        <a href="{php echo $this->createMobileUrl('artmessage',array('articleid'=>$id));}" class="am-btn am-btn-default am-btn-block">查看更多评论</a>
+		<a href="{php echo $this->createMobileUrl('artmessage',array('articleid'=>$id));}" class="messagebtn">
+		    <i class="am-icon-edit"></i>
+		</a>
+		{/if}
+		<hr class="am-article-divider">
+
+    </article>
+</div>
+
+
+
+
+{template 'footer'}
+{/if}

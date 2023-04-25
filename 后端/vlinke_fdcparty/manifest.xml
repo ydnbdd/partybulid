@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.iyunzy.cn" versionCode="0.8,1.0">
+	<application setting="false">
+		<name><![CDATA[智能党建云平台]]></name>
+		<identifie><![CDATA[vlinke_fdcparty]]></identifie>
+		<version><![CDATA[2.5.3]]></version>
+		<type><![CDATA[business]]></type>
+		<ability><![CDATA[智慧党建云平台]]></ability>
+		<description><![CDATA[智慧党建云平台]]></description>
+		<author><![CDATA[爱云资源网社区]]></author>
+		<url><![CDATA[http://www.iyunzy.cn/]]></url>
+	</application>
+	<platform>
+		<subscribes>
+		</subscribes>
+		<handles>
+		</handles>
+		<rule embed="false" />
+		<card embed="false" />
+		<supports>
+		    <item type="wxapp" />
+			<item type="app" />
+		</supports>
+        <plugins></plugins> 
+        <plugin-main name="" />
+	</platform>
+	<bindings>
+		<cover>
+			<entry title="积分商城" do="malhome" state="" direct="false"/>
+			<entry title="每日签到" do="sighome" state="" direct="false"/>
+			<entry title="民主投票" do="vothome" state="" direct="false"/>
+			<entry title="党员登录" do="login" state="" direct="false"/>
+			<entry title="系统主页" do="home" state="" direct="false"/>
+			<entry title="党建动态" do="arthome" state="" direct="false"/>
+			<entry title="党员学习" do="eduhome" state="" direct="false"/>
+			<entry title="在线考试" do="exahome" state="" direct="false"/>
+			<entry title="党员论坛" do="bbshome" state="" direct="false"/>
+			<entry title="监督执纪" do="suphome" state="" direct="false"/>
+			<entry title="志愿服务" do="serhome" state="" direct="false"/>
+			<entry title="组织活动" do="acthome" state="" direct="false"/>
+			<entry title="党费收缴" do="expcate" state="" direct="false"/>
+		</cover>
+		<menu>
+			<entry title="每日签到" do="signlog" state="" direct="false"/>
+			<entry title="民主投票" do="votproject" state="" direct="false"/>
+			<entry title="轮播图片" do="slide" state="" direct="false"/>
+			<entry title="通知公告" do="notice" state="" direct="false"/>
+			<entry title="积分记录" do="integral" state="" direct="false"/>
+			<entry title="管理人员" do="leader" state="" direct="false"/>
+			<entry title="党员管理" do="user" state="" direct="false"/>
+			<entry title="组织管理" do="branch" state="" direct="false"/>
+			<entry title="参数配置" do="param" state="" direct="false"/>
+			<entry title="控 制 台" do="home" state="" direct="false"/>
+			<entry title="党员学习" do="edulesson" state="" direct="false"/>
+			<entry title="监督执纪" do="supreadily" state="" direct="false"/>
+			<entry title="组织活动" do="activity" state="" direct="false"/>
+			<entry title="志愿服务" do="seritem" state="" direct="false"/>
+			<entry title="党建动态" do="article" state="" direct="false"/>
+			<entry title="在线考试" do="exapaper" state="" direct="false"/>
+			<entry title="党员论坛" do="bbstopic" state="" direct="false"/>
+			<entry title="党费收缴" do="expense" state="" direct="false"/>
+			<entry title="帮助中心" do="help" state="" direct="false"/>
+			<entry title="消息推送" do="msgmessage" state="" direct="false"/>
+			<entry title="积分商城" do="malgoods" state="" direct="false"/>
+		</menu>
+		<function>
+			<entry title="管理员入口" do="admin" state="" direct="true"/>
+		</function>
+		<page>
+			<entry title="党员登录" do="/vlinke_fdcparty/pages/login/login" state="" direct="false"/>
+			<entry title="系统主页" do="/vlinke_fdcparty/pages/home/home" state="" direct="false"/>
+			<entry title="个人中心" do="/vlinke_fdcparty/pages/my/my" state="" direct="false"/>
+			<entry title="积分排行" do="/vlinke_fdcparty/pages/int/intrank" state="" direct="false"/>
+			<entry title="党建动态" do="/vlinke_fdcparty/pages/art/arthome" state="" direct="false"/>
+			<entry title="党员学习" do="/vlinke_fdcparty/pages/edu/eduhome" state="" direct="false"/>
+			<entry title="在线考试" do="/vlinke_fdcparty/pages/exa/exahome" state="" direct="false"/>
+			<entry title="党员论坛" do="/vlinke_fdcparty/pages/bbs/bbshome" state="" direct="false"/>
+			<entry title="监督执纪" do="/vlinke_fdcparty/pages/sup/suphome" state="" direct="false"/>
+			<entry title="志愿服务" do="/vlinke_fdcparty/pages/ser/serhome" state="" direct="false"/>
+			<entry title="组织活动" do="/vlinke_fdcparty/pages/act/acthome" state="" direct="false"/>
+			<entry title="党费收缴" do="/vlinke_fdcparty/pages/exp/expcate" state="" direct="false"/>
+			<entry title="民主投票" do="/vlinke_fdcparty/pages/vot/vothome" state="" direct="false"/>
+		</page>
+	</bindings>
+	<permissions>
+	</permissions>
+	<install><![CDATA[install.php]]></install>
+	<uninstall><![CDATA[DROP TABLE IF EXISTS `ims_vlinke_fdcparty_actenroll`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_activity`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_actmessage`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_artcate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_article`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_artmessage`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_bbscate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_bbscollect`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_bbsreply`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_bbstopic`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_bbszan`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_branch`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_educate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_educhapter`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_edulesson`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_edulog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_edumessage`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_edustudy`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exaanswer`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exabank`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exacate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exaday`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exadevery`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exaitem`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exapaper`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_exapevery`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_expcate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_expense`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_integral`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_leader`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_malcate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_malgoods`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_mallog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_msglog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_msgmessage`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_msgtemplate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_notice`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_param`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_sercate`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_seritem`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_serlog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_sermessage`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_signlog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_slide`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_supmailbox`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_supproposal`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_supreadily`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_supreport`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_user`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_votitem`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_votlog`;
+DROP TABLE IF EXISTS `ims_vlinke_fdcparty_votproject`;
+]]></uninstall>
+	<upgrade><![CDATA[upgrade.php]]></upgrade>
+
+</manifest>

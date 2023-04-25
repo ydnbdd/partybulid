@@ -1,0 +1,169 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">组织成员</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container am-padding-top am-padding-bottom-xl" style="padding:0px;">
+    
+    {loop $brancharr $brow}
+    <div class="mybranch-box">
+        <div class="mybranch-til">{$brow['name']}</div>
+        <ul class="mybranch-con">
+            {loop $brow['luser'] $urow}
+            <li>
+                <a href="{php echo $this->createMobileUrl('mybranch',array('op'=>'buser','userid'=>$urow['id']));}">
+                    <img class="headpic" src="{php echo tomedia($urow['headpic']);}"/>
+                    <div class="userinfo">
+                        <p class="realname">{$urow['realname']}</p>
+                        <p class="leadname">{$urow['leadname']}</p>
+                        <img class="userdetails" src="{MODULE_URL}template/static/mybranch-userdetails.png"/>
+                    </div>
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+    {/loop}
+
+    
+    <div class="mybranch-box">
+        <div class="mybranch-til">{$branch['name']} 成员</div>
+        <ul class="mybranch-con">
+            {loop $userall $urow}
+            <li>
+                <a href="{php echo $this->createMobileUrl('mybranch',array('op'=>'buser','userid'=>$urow['id']));}">
+                    <img class="headpic" src="{php echo tomedia($urow['headpic']);}"/>
+                    <div class="userinfo">
+                        <p class="realname">{$urow['realname']}</p>
+                        <p class="leadname">{$ulevelarr[$urow['ulevel']]}</p>
+                        <img class="userdetails" src="{MODULE_URL}template/static/mybranch-userdetails.png"/>
+                    </div>
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+
+</div>
+{template 'footer'}
+{elseif $op=="buser"}
+{template 'header'}
+
+<div class="am-container bg-fff userhead" style="background-image: url('{php echo tomedia($param[mypic]);}');">
+    <div class="userhead-info">
+        {if empty($buser['headpic'])}
+        <img class="am-img-thumbnail headpic" src="{MODULE_URL}template/static/dfhead.jpg">
+        {else}
+        <img class="am-img-thumbnail headpic" src="{php echo tomedia($buser['headpic']);}">
+        {/if}
+        <p>
+            {php echo empty($buser['realname'])?$buser['nickname']:$buser['realname'];} &nbsp;
+            {if $buser['sex']==1}
+            <span class="am-icon-mars am-text-primary"></span>
+            {else}
+            <span class="am-icon-venus am-text-danger"></span>
+            {/if}
+        </p>
+        <p class="ulevel">{$ulevelarr[$buser['ulevel']]}</p>
+    </div>
+</div>
+
+
+<ul class="am-list am-list-border usernav">
+    <li class="user-ulevel">
+        <span>{$ulevelarr[$buser['ulevel']]}</span>
+        身份类型
+    </li>
+
+    <li class="user-branchid">
+        <span>{$branch['name']}</span>
+        隶属组织
+    </li>
+    
+    {if $buser['ulevel']==1 || $buser['ulevel']==2}
+    <li class="user-partyday">
+        <span>{$buser['partyday']}</span>
+        入党日期
+    </li>
+    {/if}
+
+    <li class="user-mobile">
+        <a href="tel:{$row['phone']}">
+            {$buser['mobile']}
+        </a>
+        手机号码
+    </li>
+</ul>
+
+{if !empty($leader)}
+<ul class="am-list am-list-border usernav" style="margin-top: 15px; margin-bottom: 15px;">
+    <li class="user-leader">
+        党内职务
+    </li>
+    {loop $leader $row}
+    <li class="user-lead">
+        <span>{$row['leadname']}</span>
+        {$row['name']}
+    </li>
+    {/loop}
+</ul>
+{/if}
+
+
+{template 'footer'}
+{elseif $op=="details"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">{$branch['name']}</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff">
+    <article class="am-article">
+        <div class="am-article-hd">
+            <h1 class="am-article-title am-padding-top am-text-xl am-text-justify">{$branch['name']}</h1>
+            <p class="am-article-meta">
+                {$blevelarr[$branch['blevel']]}
+            </p>
+        </div>
+
+        <blockquote><p>电话：<strong><a href="tel:{$branch['telephone']}">{$branch['telephone']}</a></strong>
+        </p></blockquote>
+
+        <blockquote class="am-text-justify">
+            <p style="text-indent:-3em;margin-left:3em;">地址：<strong>{$branch['address']}</strong></p>
+        </blockquote>
+
+        <hr class="am-article-divider">
+
+        <div class="am-article-bd am-text-justify">
+            {php echo html_entity_decode($branch['details'], ENT_QUOTES)}
+        </div>
+
+        <hr class="am-article-divider">
+
+    </article>
+</div>
+
+{template 'footer'}
+{/if}

@@ -1,0 +1,109 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+{if !empty($malcate)}
+<h1 class="am-header-title">{$malcate['name']}</h1>
+{elseif $userid>0}
+<h1 class="am-header-title">我能兑换的</h1>
+{elseif !empty($keywords)}
+<h1 class="am-header-title">搜索结果</h1>
+{else}
+<h1 class="am-header-title">所有商品</h1>
+{/if}
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('malcate',array('cateid'=>0));}">
+                    所有商品
+                </a>
+            </li>
+			<li>
+			    <a href="{php echo $this->createMobileUrl('malcate',array('cateid'=>0,'userid'=>$user['id']));}">
+			        我能兑换的
+			    </a>
+			</li>
+            {loop $malcatelist $row}
+            <li>
+                <a href="{php echo $this->createMobileUrl('malcate',array('cateid'=>$row['id']));}">
+                    {$row['name']}
+                </a>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+<div class="am-container am-padding-top bg-fff">
+	<div class="am-g" id="list">
+		
+	</div>
+</div>
+
+
+<div class="am-container am-padding-top am-padding-bottom">
+	<button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+
+<script type="text/javascript">
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('malcate',array('op'=>'getmore','cateid'=>$cateid,'userid'=>$userid,'keywords'=>$keywords));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+            }
+        },
+    }); 
+}
+</script>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+    <div class="am-u-sm-6 am-u-end am-margin-bottom">
+		<a href="{php echo $this->createMobileUrl('malgoods',array('id'=>$row['id']));}">
+		    <img class="am-img-thumbnail" src="{php echo tomedia($row['tilpic']);}"/>
+		</a>
+        <h3 class="am-list-item-hd am-text-justify am-text-sm am-text-truncate am-margin-top-xs am-margin-bottom-xs">
+            <a href="{php echo $this->createMobileUrl('malgoods',array('id'=>$row['id']));}">
+				{$row['title']}
+            </a>
+        </h3>
+        <div class="am-list-item-text">
+			<span>已兑:{$row['sales']}件</span>
+			<span class="am-fr">库存:{$row['stock']}件</span>
+        </div>
+		<div class="am-list-item-text am-margin-top-xs am-text-default am-text-warning">
+			<span>积分：{$row['integral']} 积分</span>
+		</div>
+    </div>
+{/loop}
+{/if}

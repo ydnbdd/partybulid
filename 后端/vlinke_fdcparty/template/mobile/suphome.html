@@ -1,0 +1,58 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">监督执纪</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('home');}">
+        <i class="am-header-icon am-icon-home"></i>
+    </a>
+</div>
+</header>
+
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $slide $row}
+        <li>
+            <a href="{$row['link']}">
+                <img src="{php echo tomedia($row['tilpic']);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+
+
+<ul class="am-avg-sm-2 default-nav sup-nav am-margin-bottom-0 bg-fff">
+    <li>
+        <a href="{php echo $this->createMobileUrl('supreadily');}">
+            <img src="{MODULE_URL}template/static/sup-readily.png">
+            <p class="am-text-truncate">随手拍</p>
+        </a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('supproposal');}">
+            <img src="{MODULE_URL}template/static/sup-proposal.png">
+            <p class="am-text-truncate">建言献策</p>
+        </a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('supmailbox');}">
+            <img src="{MODULE_URL}template/static/sup-mailbox.png">
+            <p class="am-text-truncate">书记信箱</p>
+        </a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('supreport');}">
+            <img src="{MODULE_URL}template/static/sup-report.png">
+            <p class="am-text-truncate">匿名举报</p>
+        </a>
+    </li>
+</ul>
+
+{template 'footer'}
+{/if}

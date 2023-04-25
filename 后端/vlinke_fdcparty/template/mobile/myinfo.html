@@ -1,0 +1,138 @@
+{template 'header'}
+{if $op=="display"}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">修改信息</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('myinfo',array('op'=>'headpic'));}">
+        头像
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl">
+<form method="post" name="myform" action="{php echo $this->createMobileUrl('myinfo',array('op'=>'postinfo'));}" class="am-form" data-am-validator>
+    <div class="am-form-group">
+        <label>姓名</label>
+        <input type="text" class="am-form-field" name="realname" value="{$user['realname']}" placeholder="输入真实姓名..." readonly>
+    </div>
+    <div class="am-form-group">
+        <label>身份证号</label>
+        <input type="text" class="am-form-field" name="idnumber" value="{$user['idnumber']}" placeholder="输入身份证号..." readonly>
+    </div>
+    <div class="am-form-group">
+        <label>手机号</label>
+        <input type="text" class="am-form-field js-pattern-mobile" name="mobile" value="{$user['mobile']}" placeholder="输入手机号..." required>
+    </div>
+    <div class="am-form-group">
+        <label>性别、民族</label>
+        <div class="am-input-group">
+            <span class="am-input-group-label">
+                <label class="am-radio-inline"><input type="radio" {if $user['sex']==1}checked="checked"{/if} value="1" name="sex" data-am-ucheck required> 男 </label>
+                <label class="am-radio-inline"><input type="radio" {if $user['sex']==2}checked="checked"{/if} value="2" name="sex" data-am-ucheck required> 女 </label>
+            </span>
+            <input type="text" class="am-form-field" name="nation" placeholder="输入民族..." value="{$user['nation']}" required>
+        </div>
+    </div>
+    <div class="am-form-group">
+        <label>出生日期</label>
+        <input type="text" class="am-form-field" name="birthday" placeholder="请选择出生日期..." value="{$user['birthday']}" data-am-datepicker readonly required />
+    </div>
+    <div class="am-form-group">
+        <label>籍贯</label>
+        <input type="text" class="am-form-field" name="origin" placeholder="输入籍贯..." value="{$user['origin']}" required>
+    </div>
+    <div class="am-form-group">
+        <label>文化程度</label>
+        <input type="text" class="am-form-field" name="education" placeholder="输入文化程度..." value="{$user['education']}" required>
+    </div>
+    <div class="am-form-group">
+        <input type="hidden" name="token" value="{$_W['token']}" />
+        <input type="submit" name="submit" class="am-btn am-btn-success am-btn-block" value="立即提交修改">
+    </div>
+</form>
+
+<div class="am-form-group">
+    <a class="am-btn am-btn-default am-btn-block" href="{php echo $this->createMobileUrl('login',array('op'=>'untie'));}" onclick="return confirm('确定要解除当前微信号与党员账号的关联吗？')">解绑当前微信号</a>
+</div>
+
+</div>
+
+{elseif $op=="headpic"}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">修改头像</h1>
+<div class="am-header-right am-header-nav">
+    <a href="{php echo $this->createMobileUrl('myinfo');}">
+        信息
+    </a>
+</div>
+</header>
+
+<div class="am-container bg-fff am-padding-top am-padding-bottom-xl">
+    <div id="clipArea"></div>
+    <div class="am-form-group am-form-file am-margin-top-sm">
+        <button type="button" class="am-btn am-btn-danger am-btn-block">
+        <i class="am-icon-cloud-upload"></i> 选择要上传的头像图片</button>
+        <input type="file" id="file" accept="image/*">
+    </div>
+    <div class="am-form-group am-margin-top-sm">
+        <button type="button" class="am-btn am-btn-success am-btn-block" id="clipBtn">确认裁剪并修改</button>
+    </div>
+</div>
+
+<script src="{MODULE_URL}template/static/PhotoClip.js"></script>
+<script>
+    var pc = new PhotoClip('#clipArea', {
+        size: [150,150],
+        outputSize: [320,320],
+        //adaptive: ['60%', '80%'],
+        file: '#file',
+        // view: '#view',
+        ok: '#clipBtn',
+        img: '{MODULE_URL}template/static/dfhead.jpg',
+        loadStart: function() {
+            // console.log('开始读取照片');
+        },
+        loadComplete: function() {
+            // console.log('照片读取完成');
+        },
+        done: function(dataURL) {
+            console.log(dataURL);
+            $.ajax({ 
+                url: "{php echo $this->createMobileUrl('myinfo',array('op'=>'postheadpic'));}",
+                data: {dataurl:dataURL},
+                type: 'POST',
+                async: true,
+                cache: false,
+                dataType: 'json',
+                beforeSend:function(){},//触发ajax请求开始时执行
+                success: function(ret){//ajax成功时执行
+                    console.log(ret);
+                    if (ret=="success") {
+                        alert("头像修改成功！");
+                    }else{
+                        alert("头像修改失败，请稍后再试！");
+                    }
+                    window.location = "{php echo $this->createMobileUrl('my');}";
+                },
+                error:function(){},//ajax发生错误时执行
+                complete:function(){}//ajax请求完成时执行
+            });
+        },
+        fail: function(msg) {
+            alert(msg);
+        }
+    });
+</script>
+
+{/if}
+{template 'footer'}

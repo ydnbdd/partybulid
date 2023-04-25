@@ -1,0 +1,158 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">在线考试</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('exahome')}">
+                    在线考试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaday')}">
+                    每日测试
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exapaper')}">
+                    考试项目
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('exaanswer')}">
+                    我的成绩
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+<!-- 轮播图 -->
+<div class="am-container box-slider">
+<div data-am-widget="slider" class="am-slider am-slider-a5" data-am-slider='{"directionNav":false}' >
+    <ul class="am-slides">
+        {loop $slide $row}
+        <li>
+            <a href="{$row['link']}">
+                <img src="{php echo tomedia($row['tilpic']);}" />
+            </a>
+        </li>
+        {/loop}
+    </ul>
+</div>
+</div>
+
+<!-- 导航 -->
+<ul class="am-avg-sm-3 default-nav exahome-nav am-margin-bottom-sm bg-fff">
+    <li>
+        <a href="{php echo $this->createMobileUrl('exaday')}">
+            <img src="{MODULE_URL}template/static/exa-day.png">
+            <p class="am-text-truncate">每日测试</p>
+        </a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('exapaper')}">
+            <img src="{MODULE_URL}template/static/exa-paper.png">
+            <p class="am-text-truncate">考试项目</p>
+        </a>
+    </li>
+    <li>
+        <a href="{php echo $this->createMobileUrl('exaanswer')}">
+            <img src="{MODULE_URL}template/static/exa-answer.png">
+            <p class="am-text-truncate">我的成绩</p>
+        </a>
+    </li>
+</ul>
+
+{if !empty($exaanswer)}
+<div class="am-g am-margin-bottom-sm am-padding-vertical-sm bg-fff">
+    <div class="am-u-sm-12">
+        <a href="{php echo $this->createMobileUrl('exaanswer',array('op'=>'answer','exapaperid'=>$exaanswer['paperid']));}">
+        <p class="am-margin-0" style="color:#333;">{$exaanswer['title']}</p>
+        <p class="am-margin-0 am-text-sm am-link-muted">
+            耗时：{php echo floor(($exaanswer['finishtime']-$exaanswer['stime'])/60)."分".(($exaanswer['finishtime']-$exaanswer['stime'])%60)."秒";}<br>
+            考试时间：{php echo date("Y-m-d H:i",$exaanswer['stime']);}
+            <span class="am-badge am-badge-success am-fr">{$exaanswer['getval']} 分</span>
+        </p>
+        </a>
+    </div>
+</div>
+{/if}
+
+{if !empty($exapaperall)}
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list">
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+    {loop $exapaperall $row}
+    <li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+        <div class="am-u-sm-12 am-list-main">
+            <a href="{php echo $this->createMobileUrl('exapaper',array('op'=>'create','exapaperid'=>$row['id']));}">
+            <h3 class="am-list-item-hd am-text-justify">
+                {$row['title']}
+            </h3>
+            <div class="am-list-item-text">
+                考试时长：{$row['timelimit']}分钟<br>
+                截止时间：{php echo date("Y-m-d H:i",$row['endtime']);}
+                {if $row['status']==2}
+                <span class="am-badge am-badge-success am-fr">已完成</span>
+                {elseif $row['status']==1}
+                <span class="am-badge am-badge-primary am-fr">答卷中</span>
+                {else}
+                <span class="am-badge am-badge-danger am-fr">未应试</span>
+                {/if}
+            </div>
+            </a>
+        </div>
+    </li>
+    {/loop}
+</ul>
+</div>
+</div>
+{/if}
+
+{if !empty($exadayall)}
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd am-padding-bottom-lg">
+<ul class="am-list am-margin-bottom-sm" id="list">
+    {loop $exadayall $row}
+    <li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left">
+        <div class="am-u-sm-12 am-list-main">
+            <a href="{php echo $this->createMobileUrl('exaday',array('op'=>'answer','exadayid'=>$row['id']));}">
+            <h3 class="am-list-item-hd am-text-justify">
+                {$row['title']}
+            </h3>
+            <div class="am-list-item-text">
+                测试得分：{$row['integral']} 积分
+                {if $row['status']==1}
+                <span class="am-badge am-badge-primary am-fr">未完成</span>
+                {elseif $row['status']==2}
+                <span class="am-badge am-badge-success am-fr">已完成</span>
+                {/if}
+            </div>
+            </a>
+        </div>
+    </li>
+    {/loop}
+</ul>
+<a href="{php echo $this->createMobileUrl('exaday')}" class="am-btn am-btn-block am-btn-link exahome-more">查看更多测试记录</a>
+</div>
+</div>
+{/if}
+
+
+{template 'footer'}
+{/if}

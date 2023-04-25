@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>{$param['title']}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<link rel="stylesheet" href="{MODULE_URL}template/static/amazeui.min.css">
+<link rel="stylesheet" href="{MODULE_URL}template/static/app.css?{php echo time();}">
+<script src="{MODULE_URL}template/static/jquery-3.3.1.min.js"></script>
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?6c5a6b639f009cb049fdc8e2810decd3";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+<script src="{MODULE_URL}template/static/amazeui.min.js"></script>
+{php echo register_jssdk(false);}
+</head>
+<body>
+<div class="pagemain">

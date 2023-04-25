@@ -1,0 +1,46 @@
+
+
+
+<ul class="am-avg-sm-{php echo count($param['footnav']);} am-topbar-fixed-bottom footer">
+    
+    {loop $param['footnav'] $row}
+    <li>
+        <a class="{if in_array($_GPC['do'], $row['dos'])}do{/if}" href="{$row['url']}">
+            <span style="background-image: url('{php echo tomedia($row[pic]);}');"></span>
+            <p>{$row['til']}</p>
+        </a>
+    </li>
+    {/loop}
+    
+</ul>
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?6c5a6b639f009cb049fdc8e2810decd3";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+
+<script type="text/javascript">
+wx.ready(function () {
+    sharedata = {
+        title: "{$param['sharetitle']}",
+        desc: "{$param['sharedesc']}",
+        link: "{$_W['siteurl']}",
+        imgUrl:"{php echo tomedia($param['sharepic']);}",
+        success: function(){},
+        cancel: function(){}
+    };
+    wx.showOptionMenu();
+    wx.onMenuShareAppMessage(sharedata);
+    wx.onMenuShareTimeline(sharedata);
+    wx.onMenuShareQQ(sharedata);
+    wx.onMenuShareWeibo(sharedata);
+});
+</script>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,312 @@
+{if $op=="display"}
+{template 'header'}
+<header data-am-widget="header" class="am-header am-header-default am-header-fixed page-header">
+<div class="am-header-left am-header-nav">
+    <a href="javascript:history.back(-1);">
+        <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+</div>
+<h1 class="am-header-title">{$catename}</h1>
+
+<nav data-am-widget="menu" class="am-menu am-menu-offcanvas1" data-am-menu-offcanvas> 
+<a href="javascript: void(0)" class="am-menu-toggle" style="margin-right: -10px;">
+    <i class="am-menu-toggle-icon am-icon-th-list"></i>
+</a>
+<div class="am-offcanvas" >
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <ul class="am-menu-nav am-avg-sm-1">
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbshome');}">
+                    全部话题
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbscate');}">
+                    话题分类
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mytopic'));}">
+                    我发表的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyown'));}">
+                    我评论的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myreplyother'));}">
+                    回复我的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'mycollect'));}">
+                    我收藏的
+                </a>
+            </li>
+            <li>
+                <a href="{php echo $this->createMobileUrl('bbsmy',array('op'=>'myzan'));}">
+                    我点赞的
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</nav>
+</header>
+
+
+<div data-am-widget="list_news" class="am-list-news am-list-news-default media-list" >
+<div class="am-list-news-bd">
+<ul class="am-list" id="list">
+
+</ul>
+</div>
+</div>
+
+
+<div class="am-container am-padding-top am-padding-bottom">
+    <button type="button" class="am-btn am-btn-default am-btn-block" id="getmore">点击加载更多</button>
+</div>
+
+<div class="am-modal am-modal-prompt" tabindex="-1" id="myprompt">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">评论回复</div>
+        <div class="am-modal-bd">
+            <p id="replytitle"></p>
+            <textarea class="am-modal-prompt-input" style="width: 100%;" rows="5" placeholder="输入你想说的内容..."></textarea>
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+            <span class="am-modal-btn" data-am-modal-confirm>提交</span>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+function clickReply(id,title) {
+    $("#replytitle").html(title);
+    $('#myprompt').modal({
+        relatedTarget: this,
+        onConfirm: function(e) {
+            var details = e.data || '';
+            if (details=='') { alert("请输入评论内容!"); return; }
+            $.ajax({
+                url: "{php echo $this->createMobileUrl('bbshome',array('op'=>'replypost'));}",
+                data: {id:id,details:details},
+                type: 'POST',
+                async: false,
+                cache: false,
+                dataType: 'json',
+                success: function(ret){//ajax成功时执行
+                    if (ret['status']=='error') {
+                        alert(ret['msg']);
+                    }else{
+                        $("#replylist"+id).show();
+                        var html = '<p id="reply'+ret.reply.id+'"><span>{$user[realname]}：</span>'+ret.reply.details+'<a href="javascript:replyDelete('+ret.reply.id+');"><i class="am-icon-trash"></i> 删除</a></p>';
+                        $("#replylist"+id).append(html);
+                    }
+                }
+            }); 
+        },
+        onCancel: function(e) { }
+    });
+}
+
+function replyDelete(replyid) {
+    if(confirm("删除后不可恢复，你确定要删除吗？")){
+        $.ajax({
+            url: "{php echo $this->createMobileUrl('bbshome',array('op'=>'replydelete'));}",
+            data: {replyid:replyid},
+            type: 'POST',
+            async: false,
+            cache: false,
+            dataType: 'json',
+            success: function(ret){//ajax成功时执行
+                if (ret['status']=='error') {
+                    alert(ret['msg']);
+                }else{
+                    $("#reply"+replyid).remove();
+                }
+            }
+        }); 
+    }
+}
+
+
+function clickCollect(id) {
+    $.ajax({
+        url: "{php echo $this->createMobileUrl('bbshome',array('op'=>'clickcollect'));}",
+        data: {id:id},
+        type: 'POST',
+        async: false,
+        cache: false,
+        dataType: 'json',
+        success: function(ret){//ajax成功时执行
+            if (ret==0) {
+                $("#clickcollect"+id).html('<i class="am-icon-star-o"></i> 收藏');
+            }else{
+                $("#clickcollect"+id).html('<i class="am-icon-star"></i> 取消');
+            }
+        }
+    }); 
+}
+
+function clickZan(id) {
+    $.ajax({
+        url: "{php echo $this->createMobileUrl('bbshome',array('op'=>'clickzan'));}",
+        data: {id:id},
+        type: 'POST',
+        async: false,
+        cache: false,
+        dataType: 'json',
+        success: function(ret){//ajax成功时执行
+            if (ret['uzan']==0) {
+                $("#clickzan"+id).html('<i class="am-icon-thumbs-o-up"></i> 点赞');
+            }else{
+                $("#clickzan"+id).html('<i class="am-icon-thumbs-up"></i> 取消');
+            }
+            if (ret['zanarr'].length==0) {
+                $(".zanlist").hide();
+            }else{
+                var html = '<i class="am-icon-heart-o am-margin-right-xs"></i>';
+                $.each(ret['zanarr'], function(i,val){      
+                    html += '<span>'+val.realname+'</span>';
+                });
+                $("#zanlist"+id).html(html);
+                $("#zanlist"+id).show();
+            }
+        }
+    }); 
+}
+</script>
+
+
+<script type="text/javascript">
+function moreShow(id) {
+    $("#simdetailsp"+id).hide();
+    $("#detailsp"+id).show();
+}
+
+function moreHide(id) {
+    $("#simdetailsp"+id).show();
+    $("#detailsp"+id).hide();
+}
+
+var page = 1;
+$(function() {
+    getMore();
+})
+$("#getmore").click(function() {
+    getMore();
+});
+function getMore() {
+    $.ajax({
+        type: 'POST',
+        url: "{php echo $this->createMobileUrl('bbshome',array('op'=>'getmore','cateid'=>$cateid));}",
+        data: {page:page},
+        success: function(ret){
+            // console.log(ret);
+            if (ret == 'NOTHAVE') {
+                $("#getmore").attr({"disabled":"disabled"});
+                $("#getmore").html("已全部加载完");
+            }else{
+                $("#list").append(ret);
+                page ++ ;  
+                $.AMUI.gallery.init();
+            }
+        },
+    }); 
+}
+</script>
+
+
+
+<a href="{php echo $this->createMobileUrl('bbspost');}" class="messagebtn">
+    <i class="am-icon-edit"></i>
+</a>
+{template 'footer'}
+{elseif $op=="getmore"}
+{loop $list $row}
+<li class="am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left am-g-collapse" id="bbstopicbox{$row['id']}">
+
+    <div class="am-u-sm-12 am-padding-vertical-xs listheaduser">
+        <img src="{php echo tomedia($row['headpic']);}" class="am-circle" width="70" height="70"/>
+        <p><strong class="am-text-default am-text-primary">{$row['realname']}</strong> &nbsp; {$row['bname']}</p>
+        <p>
+            <span class="am-fr">{$row['cname']}</span>
+            {php echo date("Y-m-d H:i", $row['createtime']);}
+        </p>
+    </div>
+    <div class="am-u-sm-12 am-padding-vertical-sm am-text-justify bbslist-details">
+        <a href="{php echo $this->createMobileUrl('bbstopic',array('id'=>$row['id']));}">{$row['title']}</a>
+        {if $row['ismore']==false}
+        <p class="am-text-sm am-margin-top-sm am-margin-bottom-0">{$row['details']}</p>
+        {else}
+        <p class="am-text-sm am-margin-top-sm am-margin-bottom-0 simdetailsp" id="simdetailsp{$row['id']}">
+            {$row['simdetails']}
+            <a href="javascript:moreShow({$row['id']})">全文</a>
+        </p>
+        <p class="am-text-sm am-margin-top-sm am-margin-bottom-0 detailsp" id="detailsp{$row['id']}">
+            {$row['details']}
+            <a href="javascript:moreHide({$row['id']})">收起</a>
+        </p>
+        {/if}
+    </div>
+    
+    {if !empty($row['picall'])}
+    <div class="am-u-sm-12 am-padding-bottom-sm bbscomment">
+        <ul data-am-widget="gallery" class="am-gallery am-avg-sm-3 am-thumbnails am-gallery-imgbordered"  data-am-gallery="{pureview:{weChatImagePreview: false}}">
+            {loop $row['picall'] $pic}
+            <li><img src="{php echo tomedia($pic);}" /></li>
+            {/loop}
+        </ul>
+    </div>
+    {/if}
+
+    <div class="am-u-sm-12 am-margin-top-0 am-padding-vertical-sm am-text-right" style="border-top: 1px dashed #ddd;">
+        <a class="am-margin-left am-link-muted" id="clickcollect{$row['id']}" href="javascript:clickCollect({$row['id']});">
+            {if $row['ucollect']==0}
+            <i class="am-icon-star-o"></i> 收藏
+            {else}
+            <i class="am-icon-star"></i> 取消
+            {/if}
+        </a>
+
+        <a class="am-margin-left am-link-muted" id="clickzan{$row['id']}" href="javascript:clickZan({$row['id']});">
+            {if $row['uzan']==0}
+            <i class="am-icon-thumbs-o-up"></i> 点赞
+            {else}
+            <i class="am-icon-thumbs-up"></i> 取消
+            {/if}
+        </a>
+
+        <a class="am-margin-left am-link-muted" id="clickreply{$row['id']}" href="javascript:clickReply({$row['id']},'{$row[title]}');">
+            <i class="am-icon-comments-o"></i> 评论
+        </a>
+    </div>
+
+    <div class="am-u-sm-12 zanlist" id="zanlist{$row['id']}" style="display:{php echo empty($row['zanarr'])?'none':'block';};">
+        <i class="am-icon-heart-o am-margin-right-xs"></i>
+        {loop $row['zanarr'] $zrow}
+        <span>{$zrow['realname']}</span>
+        {/loop}
+    </div>
+
+    <div class="am-u-sm-12 replylist" id="replylist{$row['id']}" style="display:{php echo empty($row['replyarr'])?'none':'block';};">
+        {loop $row['replyarr'] $rrow}
+        <p class="am-text-justify" id="reply{$rrow['id']}">
+            <span>{$rrow['realname']}：</span>
+            {php echo str_replace("\n","<br/>",$rrow['details']);}
+            {if $user['id']==$rrow['userid']}
+            <a href="javascript:replyDelete({$rrow['id']});"><i class="am-icon-trash"></i> 删除</a>
+            {/if}
+        </p>
+        {/loop}
+    </div>
+
+</li>
+{/loop}
+{/if}
